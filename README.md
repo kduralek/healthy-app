@@ -1,94 +1,61 @@
-# 10x Astro Starter
+# Healthy Meal App
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+## Project Description
+
+The Healthy Meal App is an innovative solution designed to help users customize online recipes to suit their unique dietary needs. Leveraging LLM models, the application enables users to generate and modify recipes based on personalized prompts. Key functionalities include user registration and login, dietary preference configuration, AI-powered recipe generation and modification, and comprehensive recipe management (saving, viewing, and deleting recipes with pagination).
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+- **Frontend:** Astro 5, React 19, TypeScript 5
+- **Styling:** Tailwind CSS 4, Shadcn/ui
+- **Backend:** Supabase (PostgreSQL, authentication, and backend-as-a-service capabilities)
+- **AI Integration:** LLM via Openrouter.ai for recipe modifications
+- **CI/CD & Hosting:** GitHub Actions for CI/CD, DigitalOcean with Docker for hosting
 
-## Prerequisites
+## Getting Started Locally
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
-
-## Getting Started
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Run the development server:
-
-```bash
-npm run dev
-```
-
-4. Build for production:
-
-```bash
-npm run build
-```
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd healthy-app
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Ensure you are using Node version specified in `.nvmrc` (22.14.0):**
+   ```bash
+   nvm use
+   ```
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+- **dev:** Runs the Astro development server (`astro dev`).
+- **build:** Builds the production-ready application (`astro build`).
+- **preview:** Previews the production build locally (`astro preview`).
+- **astro:** Access Astro CLI commands.
+- **lint:** Runs ESLint to analyze code quality.
+- **lint:fix:** Runs ESLint with the --fix option to automatically fix issues.
+- **format:** Formats the codebase using Prettier.
 
-## Project Structure
+## Project Scope
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+The application's MVP is focused on enabling users to:
 
-## AI Development Support
+- Register and manage their account securely.
+- Configure and update dietary preferences (selection of diets and allergens).
+- Generate recipes through natural language prompts in Polish, with AI-driven modifications to eliminate unwanted ingredients.
+- Save and manage recipes with functionalities including viewing, deletion, and history management.
+- Browse recipes with paginated lists for easy navigation.
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+## Project Status
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
-
-### Cursor IDE
-
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
-
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+This project is currently under active development.
 
 ## License
 
-MIT
+This project is licensed under the MIT License.
