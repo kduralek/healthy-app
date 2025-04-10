@@ -1,7 +1,7 @@
 # Dokument wymagań produktu (PRD) - healthy-meal-app
 
 ## 1. Przegląd produktu
-Celem aplikacji jest umożliwienie użytkownikom dostosowywania przepisów kulinarnych znalezionych w internecie do ich indywidualnych potrzeb żywieniowych. Aplikacja wykorzystuje darmowe modele AI do generowania oraz modyfikacji przepisów na podstawie preferencji użytkownika. Kluczowe funkcjonalności MVP obejmują rejestrację użytkownika, zarządzanie profilem (w tym ustawienia preferencji żywieniowych), generowanie przepisów na podstawie wpisanego promptu i możliwość modyfikacji tych przepisów przez AI, a także zapisywanie i przeglądanie przepisów.
+Celem aplikacji jest umożliwienie użytkownikom dostosowywania przepisów kulinarnych znalezionych w internecie do ich indywidualnych potrzeb żywieniowych. Aplikacja wykorzystuje modele AI do generowania oraz modyfikacji przepisów na podstawie preferencji użytkownika. Kluczowe funkcjonalności MVP obejmują rejestrację użytkownika, zarządzanie profilem (w tym ustawienia preferencji żywieniowych), generowanie przepisów na podstawie wpisanego promptu i możliwość modyfikacji tych przepisów przez AI, a także zapisywanie i przeglądanie przepisów.
 
 ## 2. Problem użytkownika
 Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online przepisów do własnych ograniczeń dietetycznych i alergii. Brak możliwości łatwego eliminowania niepożądanych składników i dostosowywania przepisów do indywidualnych preferencji żywieniowych powoduje, że gotowanie staje się bardziej skomplikowane i czasochłonne.
@@ -10,7 +10,7 @@ Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online 
 - Rejestracja i logowanie użytkownika oraz możliwość zarządzania kontem (w tym zmiana hasła).
 - Konfiguracja i aktualizacja preferencji żywieniowych (wybór diety oraz alergii).
 - Możliwość generowania przepisu na podstawie wpisanego promptu w języku polskim.
-- Integracja z darmowymi modelami AI do modyfikowania wygenerowanych przepisów, głównie poprzez eliminację niekompatybilnych składników.
+- Integracja z modelami AI do modyfikowania wygenerowanych przepisów, głównie poprzez eliminację niekompatybilnych składników.
 - Zapisywanie przepisu w bazie danych.
 - Przegląd i zarządzanie zapisanymi przepisami (odczyt, usuwanie, przegląd historii).
 - Strona wyświetlająca wszystkie przepisy użytkowników z paginacją.
