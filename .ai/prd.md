@@ -1,12 +1,15 @@
 # Dokument wymagań produktu (PRD) - healthy-meal-app
 
 ## 1. Przegląd produktu
+
 Celem aplikacji jest umożliwienie użytkownikom dostosowywania przepisów kulinarnych znalezionych w internecie do ich indywidualnych potrzeb żywieniowych. Aplikacja wykorzystuje modele AI do generowania oraz modyfikacji przepisów na podstawie preferencji użytkownika. Kluczowe funkcjonalności MVP obejmują rejestrację użytkownika, zarządzanie profilem (w tym ustawienia preferencji żywieniowych), generowanie przepisów na podstawie wpisanego promptu i możliwość modyfikacji tych przepisów przez AI, a także zapisywanie i przeglądanie przepisów.
 
 ## 2. Problem użytkownika
+
 Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online przepisów do własnych ograniczeń dietetycznych i alergii. Brak możliwości łatwego eliminowania niepożądanych składników i dostosowywania przepisów do indywidualnych preferencji żywieniowych powoduje, że gotowanie staje się bardziej skomplikowane i czasochłonne.
 
 ## 3. Wymagania funkcjonalne
+
 - Rejestracja i logowanie użytkownika oraz możliwość zarządzania kontem (w tym zmiana hasła).
 - Konfiguracja i aktualizacja preferencji żywieniowych (wybór diety oraz alergii).
 - Możliwość generowania przepisu na podstawie wpisanego promptu w języku polskim.
@@ -16,12 +19,14 @@ Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online 
 - Strona wyświetlająca wszystkie przepisy użytkowników z paginacją.
 
 ## 4. Granice produktu
+
 - MVP nie obejmuje importu przepisów z adresu URL.
 - Nie przewiduje się rozbudowanej obsługi multimediów (np. zdjęć przepisów).
 - Funkcjonalność udostępniania przepisów dla innych użytkowników oraz funkcje społecznościowe nie są częścią MVP.
 - Szczegóły dotyczące procesu modyfikacji przepisu przez AI (np. zastępowanie składników alternatywnymi zamiennikami) oraz wymagania dotyczące walidacji i formatowania przepisów pozostają do dalszego określenia.
 
 ## 5. Historyjki użytkowników
+
 - US-001: Rejestracja i logowanie oraz zarządzanie kontem
   - Opis: Jako nowy użytkownik chcę zarejestrować się, zalogować i mieć możliwość zmiany hasła, aby korzystać z aplikacji w sposób bezpieczny.
   - Kryteria akceptacji:
@@ -60,6 +65,7 @@ Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online 
     - Użytkownik może przeglądać przepisy bez możliwości ich edycji.
 
 ## 6. Metryki sukcesu
+
 - Co najmniej 90% użytkowników posiada wypełnioną sekcję preferencji żywieniowych w swoim profilu.
 - Co najmniej 75% użytkowników generuje jeden lub więcej przepisów w tygodniu.
-- Liczba zaakceptowanych i zapisanych przepisów jest monitorowana za pomocą logów aplikacji, co umożliwia ocenę skuteczności integracji AI oraz przydatności funkcjonalności aplikacji. 
+- Liczba zaakceptowanych i zapisanych przepisów jest monitorowana za pomocą logów aplikacji, co umożliwia ocenę skuteczności integracji AI oraz przydatności funkcjonalności aplikacji.

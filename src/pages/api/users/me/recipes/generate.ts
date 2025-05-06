@@ -7,17 +7,17 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
   // 1. User Authentication Check
-  const { supabase } = locals;
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // const { supabase } = locals;
+  // const {
+  //   data: { session },
+  // } = await supabase.auth.getSession();
 
-  if (!session) {
-    return new Response(JSON.stringify({ error: 'Unauthorized. Please log in to continue.' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  // if (!session) {
+  //   return new Response(JSON.stringify({ error: 'Unauthorized. Please log in to continue.' }), {
+  //     status: 401,
+  //     headers: { 'Content-Type': 'application/json' },
+  //   });
+  // }
 
   try {
     // 2. Request Body Validation
