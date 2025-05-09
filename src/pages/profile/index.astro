@@ -1,0 +1,42 @@
+---
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+---
+
+<ProtectedLayout title="Profil - Healthy App">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border p-6">
+      <h1 class="text-2xl font-bold mb-6">Profil użytkownika</h1>
+
+      <div class="flex flex-col sm:flex-row gap-6">
+        <div class="flex-shrink-0 flex items-center justify-center">
+          <div
+            class="flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-3xl font-medium"
+          >
+            JD
+          </div>
+        </div>
+
+        <div class="flex-grow space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Imię</label>
+            <div class="mt-1 p-2 bg-gray-50 border border-gray-200 rounded-md">John Doe</div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Adres e-mail</label>
+            <div class="mt-1 p-2 bg-gray-50 border border-gray-200 rounded-md">user@example.com</div>
+          </div>
+
+          <div class="pt-2">
+            <a
+              href="/profile/change-password"
+              class="inline-flex items-center bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            >
+              Zmiana hasła
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ProtectedLayout>
