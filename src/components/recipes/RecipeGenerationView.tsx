@@ -1,4 +1,3 @@
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRecipeGeneration } from './hooks/useRecipeGeneration';
 import { useUserPreferences } from './hooks/useUserPreferences';
 import { RecipePromptForm } from './RecipePromptForm';
@@ -13,14 +12,7 @@ export function RecipeGenerationView() {
   const content = (
     <div className="space-y-8">
       {!state.recipeDraft ? (
-        <>
-          {state.error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{state.error}</AlertDescription>
-            </Alert>
-          )}
-          <RecipePromptForm onSubmit={generateRecipe} isLoading={state.isLoading} error={state.error} />
-        </>
+        <RecipePromptForm onSubmit={generateRecipe} isLoading={state.isLoading} error={state.error} />
       ) : state.isLoading ? (
         <RecipePreviewSkeleton />
       ) : (

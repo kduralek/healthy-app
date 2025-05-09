@@ -1,37 +1,54 @@
 import type { RecipeDraftDTO } from '@/types';
+import { OpenRouterService } from './openrouter.service';
 
-// TODO: Replace with actual AI integration in the future
-// This is a mock implementation for development environment
+const openRouter = new OpenRouterService(import.meta.env.OPENROUTER_API_KEY, {
+  defaultModel: 'gpt-4o-mini',
+  defaultParams: {
+    max_tokens: 1000,
+    temperature: 0.7,
+  },
+});
+
+const RECIPE_SYSTEM_PROMPT = `You are a professional chef and nutritionist. Generate a detailed, well-structured recipe based on the user's prompt.
+The recipe should include:
+1. A clear, concise title
+2. A list of ingredients with measurements
+3. Step-by-step cooking instructions
+4. Any relevant nutritional notes or tips
+
+Format the recipe in Markdown, in Polish.`;
+
 export async function generateRecipeDraft(prompt: string): Promise<RecipeDraftDTO> {
   const startTime = performance.now();
 
-  // Simulate AI processing time (1-3 seconds)
-  await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000));
+  try {
+    const completion = await openRouter.createChatCompletion({
+      messages: [
+        { role: 'system', content: RECIPE_SYSTEM_PROMPT },
+        { role: 'user', content: prompt },
+      ],
+    });
 
-  // Mock recipe generation
-  const title = `Recipe for ${prompt.split(' ').slice(0, 3).join(' ')}...`;
-  const content = `
-# ${title}
+    const content = completion.choices[0]?.message?.content;
 
-## Ingredients
-- 2 cups of fresh ingredients
-- 1 tablespoon of olive oil
-- Salt and pepper to taste
+    if (!content) {
+      throw new Error('No recipe content generated');
+    }
 
-## Instructions
-1. Prepare all ingredients as directed.
-2. Cook according to best practices.
-3. Serve and enjoy!
+    // Extract title from the first line of markdown (assumes first line is a # heading)
+    const title = content.split('\n')[0].replace(/^#\s*/, '').trim();
 
-This recipe was generated based on your prompt: "${prompt}"`;
+    const endTime = performance.now();
+    const generationDuration = Math.round(endTime - startTime);
 
-  const endTime = performance.now();
-  const generationDuration = Math.round(endTime - startTime);
-
-  return {
-    title,
-    content,
-    generated_at: new Date().toISOString(),
-    generation_duration: generationDuration,
-  };
+    return {
+      title,
+      content,
+      generated_at: new Date().toISOString(),
+      generation_duration: generationDuration,
+    };
+  } catch (error) {
+    console.error('Recipe generation failed:', error);
+    throw new Error('Failed to generate recipe. Please try again later.');
+  }
 }
