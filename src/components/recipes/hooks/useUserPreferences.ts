@@ -15,7 +15,15 @@ export function useUserPreferences(): UseUserPreferencesResult {
   useEffect(() => {
     async function fetchPreferences() {
       try {
-        const response = await fetch('/api/users/me/preferences');
+        // const response = await fetch('/api/users/me/preferences');
+        const response = {
+          ok: true,
+          json: async () => ({
+            diets: [],
+            allergens: [],
+            error: null,
+          }),
+        };
 
         if (!response.ok) {
           const errorData = await response.json();
