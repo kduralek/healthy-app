@@ -4,7 +4,11 @@ import { Input } from '@/components/ui/input';
 import { FormMessage } from '@/components/ui/auth/FormMessage';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
-export function LoginForm() {
+interface LoginFormProps {
+  returnUrl?: string;
+}
+
+export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProps) {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
@@ -16,25 +20,43 @@ export function LoginForm() {
 
     // Basic client-side validation
     if (!email.trim()) {
-      setError('Email is required');
+      setError('Email jest wymagany');
       return;
     }
 
     if (!password.trim()) {
-      setError('Password is required');
+      setError('Hasło jest wymagane');
       return;
     }
 
-    // Simulate form submission
     setIsLoading(true);
 
-    // In a real implementation, this would call the authentication API
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Call the login API endpoint
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      // UI implementation only - No actual authentication
-      console.log('Login attempted with:', { email, password });
-    }, 1000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle error response
+        setError(data.error?.message || 'Nie udało się zalogować. Spróbuj ponownie.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Successful login - redirect to the return URL or default
+      window.location.href = data.data?.redirectTo || returnUrl;
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Wystąpił problem z połączeniem. Spróbuj ponownie.');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -96,10 +118,10 @@ export function LoginForm() {
             {isLoading ? (
               <>
                 <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
+                Logowanie...
               </>
             ) : (
-              'Sign In'
+              'Zaloguj się'
             )}
           </Button>
 

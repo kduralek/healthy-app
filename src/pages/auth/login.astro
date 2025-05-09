@@ -1,8 +1,19 @@
 ---
 import AuthLayout from '@/layouts/AuthLayout.astro';
 import { LoginForm } from '@/components/auth/LoginForm';
+
+// Disable prerendering for this page
+export const prerender = false;
+
+// Get any return URL from the query string
+const returnUrl = Astro.url.searchParams.get('returnUrl') || '/app/recipes/generate';
+
+// If user is already logged in, redirect to the return URL
+if (Astro.locals.user) {
+  return Astro.redirect(returnUrl);
+}
 ---
 
 <AuthLayout title="Zaloguj się - Healthy App">
-  <LoginForm client:load />
+  <LoginForm client:load returnUrl={returnUrl} />
 </AuthLayout>
