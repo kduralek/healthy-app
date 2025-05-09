@@ -1,28 +1,21 @@
 import * as React from 'react';
 import { Button } from '../ui/button';
+import { useAuth } from '@/components/auth/hooks/useAuth';
 
-export function UserNav() {
+interface UserNavProps {
+  userEmail: string;
+}
+
+export function UserNav({ userEmail }: UserNavProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { logout } = useAuth();
 
-  // In a real implementation, this would come from the auth context
-  const user = {
-    email: 'user@example.com',
-    name: 'John Doe',
-    imageUrl: null,
-  };
-
-  // Generate initials from name
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((part) => part.charAt(0).toUpperCase())
-      .join('')
-      .slice(0, 2);
-  };
-
-  const handleLogout = () => {
-    // In a real implementation, this would call the logout API
-    console.log('Logout clicked');
+  // Generate initials from email
+  const getInitials = (email?: string) => {
+    if (!email) {
+      return 'U';
+    }
+    return email.substring(0, 2).toUpperCase();
   };
 
   // Close dropdown when clicking outside or pressing escape
@@ -59,13 +52,9 @@ export function UserNav() {
         aria-controls="user-menu"
       >
         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-medium">
-          {user.imageUrl ? (
-            <img src={user.imageUrl} alt={user.name} className="w-full h-full rounded-full object-cover" />
-          ) : (
-            getInitials(user.name)
-          )}
+          {getInitials(userEmail)}
         </div>
-        <span className="hidden md:inline text-sm font-medium">{user.name}</span>
+        <span className="hidden md:inline text-sm font-medium">{userEmail}</span>
         <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
       </Button>
 
@@ -76,8 +65,7 @@ export function UserNav() {
           role="menu"
         >
           <div className="p-2 pt-1">
-            <p className="text-sm font-medium">{user.name}</p>
-            <p className="text-xs text-muted-foreground">{user.email}</p>
+            <p className="text-sm font-medium">{userEmail}</p>
           </div>
 
           <div className="h-px bg-border my-1" />
@@ -112,7 +100,7 @@ export function UserNav() {
           <Button
             variant="ghost"
             className="flex items-center justify-start gap-2 w-full rounded-sm px-2 py-1.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
-            onClick={handleLogout}
+            onClick={logout}
             role="menuitem"
           >
             <LogOutIcon className="h-4 w-4" />

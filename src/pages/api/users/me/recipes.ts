@@ -21,22 +21,22 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request, locals }) => {
   // 1. User Authentication Check
   const { supabase } = locals;
-  // const {
-  //   data: { session },
-  // } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  // if (!session) {
-  //   return new Response(JSON.stringify({ error: 'Unauthorized. Please log in to continue.' }), {
-  //     status: 401,
-  //     headers: { 'Content-Type': 'application/json' },
-  //   });
-  // }
+  if (!session) {
+    return new Response(JSON.stringify({ error: 'Unauthorized. Please log in to continue.' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-  const session = {
-    user: {
-      id: '5606c140-a6ac-4704-bd6f-b92b2d70537c',
-    },
-  };
+  // const session = {
+  //   user: {
+  //     id: '5606c140-a6ac-4704-bd6f-b92b2d70537c',
+  //   },
+  // };
 
   try {
     // 2. Request Body Validation

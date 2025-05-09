@@ -2,22 +2,30 @@ import type { APIRoute } from 'astro';
 import { generateRecipeDraftSchema } from '@/lib/schemas/recipe.schema';
 import { generateRecipeDraft } from '@/lib/services/recipeDraft.service';
 import type { RecipeDraftDTO } from '@/types';
+import { createSupabaseServerClient } from '@/db/supabase.client';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  // 1. User Authentication Check
-  // const { supabase } = locals;
-  // const {
-  //   data: { session },
-  // } = await supabase.auth.getSession();
+export const POST: APIRoute = async ({ request, cookies }) => {
+  // Create a Supabase client with cookie handling
+  const supabase = createSupabaseServerClient({
+    cookies,
+    headers: request.headers,
+  });
 
-  // if (!session) {
-  //   return new Response(JSON.stringify({ error: 'Unauthorized. Please log in to continue.' }), {
-  //     status: 401,
-  //     headers: { 'Content-Type': 'application/json' },
-  //   });
-  // }
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return new Response(
+      JSON.stringify({
+        error: 'Unauthorized - please log in',
+      }),
+      { status: 401 }
+    );
+  }
 
   try {
     // 2. Request Body Validation

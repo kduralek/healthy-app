@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { supabaseClient } from '@/db/supabase.client';
+import { createSupabaseServerClient, supabaseClient } from '@/db/supabase.client';
 import type { UserPreferencesDTO } from '@/types';
 
 interface UserDiet {
@@ -12,15 +12,20 @@ interface UserAllergen {
 
 export const prerender = false;
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request, cookies }) => {
   try {
-    // Get user from session
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabaseClient.auth.getSession();
+    // Create a Supabase client with cookie handling
+    const supabase = createSupabaseServerClient({
+      cookies,
+      headers: request.headers,
+    });
 
-    if (sessionError || !session) {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized - please log in',
@@ -33,7 +38,7 @@ export const GET: APIRoute = async () => {
     const { data: userDiets, error: dietsError } = await supabaseClient
       .from('user_diets')
       .select('diet_id')
-      .eq('user_id', session.user.id);
+      .eq('user_id', user.id);
 
     if (dietsError) {
       console.error('Error fetching user diets:', dietsError);
@@ -48,7 +53,7 @@ export const GET: APIRoute = async () => {
     const { data: userAllergens, error: allergensError } = await supabaseClient
       .from('user_allergens')
       .select('allergen_id')
-      .eq('user_id', session.user.id);
+      .eq('user_id', user.id);
 
     if (allergensError) {
       console.error('Error fetching user allergens:', allergensError);

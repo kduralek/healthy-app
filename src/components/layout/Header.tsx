@@ -2,10 +2,10 @@ import { Button } from '@/components/ui/button';
 import { UserNav } from '@/components/auth/UserNav';
 
 interface HeaderProps {
-  isAuthenticated?: boolean;
+  userEmail?: string;
 }
 
-export function Header({ isAuthenticated = false }: HeaderProps) {
+export function Header({ userEmail }: HeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 py-3 px-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -17,8 +17,8 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
         </a>
 
         <div className="flex items-center gap-4">
-          {isAuthenticated ? (
-            <UserNav />
+          {userEmail ? (
+            <UserNav userEmail={userEmail} />
           ) : (
             <>
               <a href="/auth/login" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
