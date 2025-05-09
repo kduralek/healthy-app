@@ -20,174 +20,111 @@ export interface Database {
   };
   public: {
     Tables: {
-      allergens: {
+      recipes: {
         Row: {
           id: string;
-          name: string;
+          title: string;
+          content: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+          generated_at: string;
+          generation_duration: number;
         };
         Insert: {
           id?: string;
-          name: string;
+          title: string;
+          content: string;
+          user_id: string;
+          created_at?: string;
+          updated_at?: string;
+          generated_at: string;
+          generation_duration: number;
         };
         Update: {
           id?: string;
-          name?: string;
+          title?: string;
+          content?: string;
+          user_id?: string;
+          created_at?: string;
+          updated_at?: string;
+          generated_at?: string;
+          generation_duration?: number;
         };
-        Relationships: [];
       };
       diets: {
         Row: {
           id: string;
           name: string;
+          description: string | null;
+          created_at: string;
         };
         Insert: {
           id?: string;
           name: string;
+          description?: string | null;
+          created_at?: string;
         };
         Update: {
           id?: string;
           name?: string;
+          description?: string | null;
+          created_at?: string;
         };
-        Relationships: [];
       };
-      recipe_allergens: {
+      allergens: {
         Row: {
-          allergen_id: string;
-          recipe_id: string;
-        };
-        Insert: {
-          allergen_id: string;
-          recipe_id: string;
-        };
-        Update: {
-          allergen_id?: string;
-          recipe_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'recipe_allergens_allergen_id_fkey';
-            columns: ['allergen_id'];
-            isOneToOne: false;
-            referencedRelation: 'allergens';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'recipe_allergens_recipe_id_fkey';
-            columns: ['recipe_id'];
-            isOneToOne: false;
-            referencedRelation: 'recipes';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      recipe_diets: {
-        Row: {
-          diet_id: string;
-          recipe_id: string;
-        };
-        Insert: {
-          diet_id: string;
-          recipe_id: string;
-        };
-        Update: {
-          diet_id?: string;
-          recipe_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'recipe_diets_diet_id_fkey';
-            columns: ['diet_id'];
-            isOneToOne: false;
-            referencedRelation: 'diets';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'recipe_diets_recipe_id_fkey';
-            columns: ['recipe_id'];
-            isOneToOne: false;
-            referencedRelation: 'recipes';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      recipes: {
-        Row: {
-          content: string;
-          created_at: string;
-          generated_at: string;
-          generation_duration: number;
           id: string;
-          title: string;
-          updated_at: string;
-          user_id: string;
+          name: string;
+          description: string | null;
+          created_at: string;
         };
         Insert: {
-          content: string;
-          created_at?: string;
-          generated_at: string;
-          generation_duration: number;
           id?: string;
-          title: string;
-          updated_at?: string;
-          user_id: string;
+          name: string;
+          description?: string | null;
+          created_at?: string;
         };
         Update: {
-          content?: string;
-          created_at?: string;
-          generated_at?: string;
-          generation_duration?: number;
           id?: string;
-          title?: string;
-          updated_at?: string;
-          user_id?: string;
+          name?: string;
+          description?: string | null;
+          created_at?: string;
         };
-        Relationships: [];
-      };
-      user_allergens: {
-        Row: {
-          allergen_id: string;
-          user_id: string;
-        };
-        Insert: {
-          allergen_id: string;
-          user_id: string;
-        };
-        Update: {
-          allergen_id?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'user_allergens_allergen_id_fkey';
-            columns: ['allergen_id'];
-            isOneToOne: false;
-            referencedRelation: 'allergens';
-            referencedColumns: ['id'];
-          },
-        ];
       };
       user_diets: {
         Row: {
-          diet_id: string;
           user_id: string;
+          diet_id: string;
+          created_at: string;
         };
         Insert: {
-          diet_id: string;
           user_id: string;
+          diet_id: string;
+          created_at?: string;
         };
         Update: {
-          diet_id?: string;
           user_id?: string;
+          diet_id?: string;
+          created_at?: string;
         };
-        Relationships: [
-          {
-            foreignKeyName: 'user_diets_diet_id_fkey';
-            columns: ['diet_id'];
-            isOneToOne: false;
-            referencedRelation: 'diets';
-            referencedColumns: ['id'];
-          },
-        ];
+      };
+      user_allergens: {
+        Row: {
+          user_id: string;
+          allergen_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          allergen_id: string;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          allergen_id?: string;
+          created_at?: string;
+        };
       };
     };
     Views: Record<never, never>;
