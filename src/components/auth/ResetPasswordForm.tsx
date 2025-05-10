@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormMessage } from '@/components/ui/auth/FormMessage';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabaseClient } from '@/db/supabase.client';
+import { Loader2 as SpinnerIcon } from 'lucide-react';
 
 export function ResetPasswordForm() {
   const [email, setEmail] = React.useState('');
@@ -17,27 +19,38 @@ export function ResetPasswordForm() {
 
     // Basic client-side validation
     if (!email.trim()) {
-      setError('Email is required');
+      setError('Email jest wymagany');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
+      setError('Wprowadź poprawny adres email');
       return;
     }
 
-    // Simulate form submission
     setIsLoading(true);
 
-    // In a real implementation, this would call the password reset API
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Call Supabase to send password reset email
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/confirm?type=recovery`,
+      });
 
-      // UI implementation only - No actual password reset
-      setMessage("If an account exists with that email, we've sent instructions to reset your password");
-      console.log('Password reset requested for:', { email });
-    }, 1000);
+      if (error) {
+        throw error;
+      }
+
+      // Show success message regardless of whether the email exists
+      // This is a security measure to prevent email enumeration
+      setMessage('Jeśli konto istnieje, na podany adres email zostały wysłane instrukcje resetowania hasła');
+      setEmail('');
+    } catch (err) {
+      console.error('Password reset error:', err);
+      setError('Wystąpił problem z resetowaniem hasła. Spróbuj ponownie.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -98,18 +111,3 @@ export function ResetPasswordForm() {
     </Card>
   );
 }
-
-const SpinnerIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-  </svg>
-);

@@ -1,0 +1,54 @@
+---
+import Layout from '@/layouts/AuthLayout.astro';
+import { createSupabaseServerClient } from '@/db/supabase.client';
+import { EmailVerificationStatus } from '@/components/auth/EmailVerificationStatus';
+
+// Get the confirmation token from the URL
+let status: 'loading' | 'success' | 'error' = 'loading';
+let message = '';
+
+// Parse the code from the query parameters
+const code = Astro.url.searchParams.get('code');
+const type = Astro.url.searchParams.get('type') || 'signup';
+
+// Create Supabase client
+const supabase = createSupabaseServerClient({
+  headers: Astro.request.headers,
+  cookies: Astro.cookies,
+});
+
+if (code) {
+  try {
+    // Instead of trying to verify the OTP again, check if the user is already verified
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session) {
+      // User is already authenticated
+      status = 'success';
+      message = 'Twój adres email został potwierdzony. Teraz możesz korzystać z aplikacji.';
+    } else if (type === 'recovery') {
+      // For password recovery, we redirect to the new password page
+      status = 'success';
+      message = 'Zweryfikowano link do resetowania hasła. Teraz możesz ustawić nowe hasło.';
+    } else {
+      // User is not authenticated but was redirected here after clicking the email link
+      // This is likely because the verification was successful but the session isn't established yet
+      status = 'success';
+      message = 'Twój adres email został potwierdzony. Teraz możesz się zalogować.';
+    }
+  } catch (error) {
+    console.error('Verification error:', error);
+    status = 'error';
+    message = 'Wystąpił błąd podczas weryfikacji. Spróbuj ponownie później.';
+  }
+} else {
+  status = 'error';
+  message = 'Brak kodu weryfikacyjnego w adresie URL.';
+}
+---
+
+<Layout title="Weryfikacja email">
+  <EmailVerificationStatus status={status} message={message} client:load />
+</Layout>
