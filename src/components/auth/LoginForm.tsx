@@ -93,7 +93,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
               <label className="text-sm font-medium text-gray-200" htmlFor="password">
                 Hasło
               </label>
-              <a href="/auth/reset-password" className="text-sm text-blue-300 hover:text-blue-200 transition-colors">
+              <a href="/auth/forgot-password" className="text-sm text-blue-300 hover:text-blue-200 transition-colors">
                 Zapomniałeś hasła?
               </a>
             </div>

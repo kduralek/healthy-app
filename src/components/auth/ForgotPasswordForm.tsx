@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormMessage } from '@/components/ui/auth/FormMessage';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabaseClient } from '@/db/supabase.client';
 import { Loader2 as SpinnerIcon } from 'lucide-react';
 
-export function ResetPasswordForm() {
+export function ForgotPasswordForm() {
   const [email, setEmail] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -32,18 +31,22 @@ export function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      // Call Supabase to send password reset email
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/confirm?type=recovery`,
+      // Call reset password API endpoint instead of direct Supabase client
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       });
 
-      if (error) {
-        throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Wystąpił problem z resetowaniem hasła');
       }
 
-      // Show success message regardless of whether the email exists
-      // This is a security measure to prevent email enumeration
-      setMessage('Jeśli konto istnieje, na podany adres email zostały wysłane instrukcje resetowania hasła');
+      setMessage(data.message);
       setEmail('');
     } catch (err) {
       console.error('Password reset error:', err);

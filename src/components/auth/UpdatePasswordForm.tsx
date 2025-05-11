@@ -3,21 +3,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormMessage } from '@/components/ui/auth/FormMessage';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabaseClient } from '@/db/supabase.client';
 import { Loader2 as SpinnerIcon } from 'lucide-react';
 
-export function UpdatePasswordForm() {
+interface UpdatePasswordFormProps {
+  isCodeValid: boolean;
+  errorMessage: string;
+}
+
+export function UpdatePasswordForm({ isCodeValid, errorMessage }: UpdatePasswordFormProps) {
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(errorMessage || null);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isComplete, setIsComplete] = React.useState(false);
+
+  // Ustawiamy błąd, gdy kod nie jest poprawny, przy pierwszym renderowaniu
+  React.useEffect(() => {
+    if (!isCodeValid && !error) {
+      setError('Kod resetowania hasła jest nieprawidłowy lub wygasł. Poproś o nowy link resetujący.');
+    }
+  }, [isCodeValid, error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setMessage(null);
+
+    // Jeśli kod nie jest poprawny, blokujemy zmianę hasła
+    if (!isCodeValid) {
+      setError('Kod resetowania hasła jest nieprawidłowy lub wygasł. Poproś o nowy link resetujący.');
+      return;
+    }
 
     // Basic client-side validation
     if (!password.trim()) {
@@ -41,45 +57,71 @@ export function UpdatePasswordForm() {
     }
 
     if (password !== passwordConfirm) {
-      setError('Hasła nie są identyczne');
+      setError('Hasła nie pasują do siebie');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Update the user's password
-      const { error } = await supabaseClient.auth.updateUser({ password });
+      // Używamy naszego API endpoint zamiast bezpośredniego wywołania Supabase
+      const response = await fetch('/api/auth/update-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password,
+        }),
+      });
 
-      if (error) {
-        throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Wystąpił problem z aktualizacją hasła');
       }
 
-      // Show success message
-      setMessage('Twoje hasło zostało pomyślnie zmienione.');
-      setIsComplete(true);
-
-      // Clear form
+      setMessage(data.message || 'Twoje hasło zostało pomyślnie zresetowane. Możesz teraz zalogować się nowym hasłem.');
       setPassword('');
       setPasswordConfirm('');
     } catch (err) {
       console.error('Password update error:', err);
-      setError('Wystąpił problem z aktualizacją hasła. Spróbuj ponownie.');
+      setError(err instanceof Error ? err.message : 'Wystąpił problem z aktualizacją hasła. Spróbuj ponownie później.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Jeśli kod nie jest poprawny, wyświetlamy tylko komunikat o błędzie
+  if (!isCodeValid) {
+    return (
+      <Card className="border-none bg-transparent shadow-none">
+        <CardHeader className="space-y-1 pb-3">
+          <CardTitle className="text-2xl font-bold text-center text-white">Ustaw nowe hasło</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FormMessage type="error">{error || errorMessage}</FormMessage>
+          <div className="mt-6 text-center">
+            <a href="/auth/forgot-password" className="text-blue-300 hover:text-blue-200 transition-colors">
+              Poproś o nowy link resetujący
+            </a>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-none bg-transparent shadow-none">
       <CardHeader className="space-y-1 pb-3">
         <CardTitle className="text-2xl font-bold text-center text-white">Ustaw nowe hasło</CardTitle>
-        <CardDescription className="text-gray-300 text-center">Wprowadź swoje nowe hasło dla konta</CardDescription>
+        <CardDescription className="text-gray-300 text-center">Utwórz nowe hasło dla swojego konta</CardDescription>
       </CardHeader>
 
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && <FormMessage type="error">{error}</FormMessage>}
+
           {message && <FormMessage type="success">{message}</FormMessage>}
 
           <div className="space-y-2">
@@ -93,9 +135,11 @@ export function UpdatePasswordForm() {
               onChange={(e) => setPassword(e.target.value)}
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               autoComplete="new-password"
-              disabled={isComplete}
               required
             />
+            <p className="text-xs text-gray-400">
+              Hasło musi mieć co najmniej 8 znaków i zawierać wielką literę, cyfrę i znak specjalny
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -109,35 +153,33 @@ export function UpdatePasswordForm() {
               onChange={(e) => setPasswordConfirm(e.target.value)}
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               autoComplete="new-password"
-              disabled={isComplete}
               required
             />
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">
-          {!isComplete ? (
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-              disabled={isLoading || isComplete}
-            >
-              {isLoading ? (
-                <>
-                  <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
-                  Aktualizacja hasła...
-                </>
-              ) : (
-                'Ustaw nowe hasło'
-              )}
-            </Button>
-          ) : (
-            <Button
-              onClick={() => (window.location.href = '/auth/login')}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-            >
-              Przejdź do logowania
-            </Button>
+          <Button
+            type="submit"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+            disabled={isLoading || !!message}
+          >
+            {isLoading ? (
+              <>
+                <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+                Ustawianie nowego hasła...
+              </>
+            ) : (
+              'Ustaw nowe hasło'
+            )}
+          </Button>
+
+          {message && (
+            <div className="text-center text-sm text-gray-300">
+              <a href="/auth/login" className="text-blue-300 hover:text-blue-200 transition-colors">
+                Przejdź do logowania
+              </a>
+            </div>
           )}
         </CardFooter>
       </form>

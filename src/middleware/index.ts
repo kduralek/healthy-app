@@ -7,14 +7,14 @@ const PUBLIC_PATHS = [
   // Auth pages
   '/auth/login',
   '/auth/register',
-  '/auth/reset-password',
-  '/auth/new-password',
+  '/auth/forgot-password',
+  '/auth/update-password',
   '/auth/confirm',
   // Auth API endpoints
   '/api/auth/login',
   '/api/auth/register',
-  '/api/auth/reset-password',
-  '/api/auth/new-password',
+  '/api/auth/forgot-password',
+  '/api/auth/update-password',
   // Public pages
   '/',
 ];
@@ -33,6 +33,8 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  console.log('user', user);
 
   if (user) {
     // Add user data to locals for use in components
