@@ -108,7 +108,7 @@ Dla każdego scenariusza:
    ```
 
 4. Utwórz `src/lib/openrouterService.ts` i zaimplementuj klasę według sekcji 2–4 z użyciem `axios` i `ajv`.
-5. Dodaj testy jednostkowe w `src/lib/openrouterService.test.ts` (symulacja odpowiedzi, walidacja błędów).
+5. Dodaj testy jednostkowe w `src/lib/openrouterService.spec.ts` (symulacja odpowiedzi, walidacja błędów).
 6. W integracji (w API Astro lub React) zaimportuj i użyj serwisu:
 
    ```ts

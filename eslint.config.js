@@ -56,11 +56,22 @@ const reactConfig = tseslint.config({
   },
 });
 
+// Configuration for test files
+const testFilesConfig = tseslint.config({
+  files: ['**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}', 'vitest.setup.ts'],
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/no-empty-object-type': 'off',
+  },
+});
+
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
   baseConfig,
   jsxA11yConfig,
   reactConfig,
+  testFilesConfig,
   eslintPluginAstro.configs['flat/recommended'],
   eslintPluginPrettier
 );
