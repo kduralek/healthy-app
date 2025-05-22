@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FormMessage } from '@/components/ui/auth/FormMessage';
+import { FormMessage } from './FormMessage';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
 interface LoginFormProps {
