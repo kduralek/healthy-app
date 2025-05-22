@@ -21,7 +21,7 @@ const userEmail = Astro.locals.user?.email ?? undefined;
   </head>
   <body>
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex flex-col">
-      <Header userEmail={userEmail} client:load />
+      <Header userEmail={userEmail} />
       <slot />
       <Footer />
     </div>
