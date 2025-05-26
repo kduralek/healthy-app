@@ -7,6 +7,12 @@ interface UseUserPreferencesResult {
   error: string | null;
 }
 
+interface UserPreferencesErrorResponse {
+  error: string;
+  message?: string;
+  details?: unknown;
+}
+
 export function useUserPreferences(): UseUserPreferencesResult {
   const [preferences, setPreferences] = useState<UserPreferencesDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,11 +32,11 @@ export function useUserPreferences(): UseUserPreferencesResult {
         // };
 
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorData = (await response.json()) as UserPreferencesErrorResponse;
           throw new Error(errorData.error || 'Nie udało się pobrać preferencji użytkownika');
         }
 
-        const data: UserPreferencesDTO = await response.json();
+        const data = (await response.json()) as UserPreferencesDTO;
         setPreferences(data);
         setError(null);
       } catch (error) {

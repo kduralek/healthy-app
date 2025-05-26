@@ -12,6 +12,23 @@ interface RecipeGenerationState {
   savedRecipeId: string | null;
 }
 
+// Response interfaces for API endpoints
+interface RecipeGenerationErrorResponse {
+  error: string;
+  message?: string;
+  details?: unknown;
+}
+
+interface RecipeSaveSuccessResponse {
+  id: string;
+}
+
+interface RecipeSaveErrorResponse {
+  error: string;
+  message?: string;
+  details?: unknown;
+}
+
 export function useRecipeGeneration() {
   const [state, setState] = useState<RecipeGenerationState>({
     isLoading: false,
@@ -47,11 +64,11 @@ export function useRecipeGeneration() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = (await response.json()) as RecipeGenerationErrorResponse;
         throw new Error(errorData.error || 'Wystąpił błąd podczas generowania przepisu');
       }
 
-      const recipeDraft = await response.json();
+      const recipeDraft = (await response.json()) as RecipeDraftDTO;
       setState((prev) => ({ ...prev, isLoading: false, recipeDraft }));
     } catch (error) {
       setState((prev) => ({
@@ -89,11 +106,11 @@ export function useRecipeGeneration() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = (await response.json()) as RecipeSaveErrorResponse;
         throw new Error(errorData.error || 'Wystąpił błąd podczas zapisywania przepisu');
       }
 
-      const { id } = await response.json();
+      const { id } = (await response.json()) as RecipeSaveSuccessResponse;
       setState((prev) => ({
         ...prev,
         isSaving: false,

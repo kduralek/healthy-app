@@ -1,3 +1,9 @@
+interface LogoutResponse {
+  error?: {
+    message: string;
+  };
+}
+
 export function useAuth() {
   const logout = async () => {
     try {
@@ -10,7 +16,7 @@ export function useAuth() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = (await response.json()) as LogoutResponse;
         throw new Error(errorData.error?.message || 'Failed to logout');
       }
 

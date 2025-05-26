@@ -4,6 +4,15 @@ import { Input } from '@/components/ui/input';
 import { FormMessage } from './FormMessage';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
+interface RegisterResponse {
+  data: {
+    message: string;
+  };
+  error?: {
+    message: string;
+  };
+}
+
 export function RegisterForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -70,7 +79,7 @@ export function RegisterForm() {
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as RegisterResponse;
 
       if (!response.ok) {
         // Handle error response

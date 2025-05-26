@@ -1,0 +1,41 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22.14.0'
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and Dependencies
+        uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build application
+        run: npm run build
+        # env:
+        # Add production environment variables here
+        # SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        # SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Deploy to DigitalOcean
+        run: |
+          echo "Deployment step - configure based on your DigitalOcean setup"
+          echo "This could include Docker build and push, or direct file transfer"
+          # Example deployment commands would go here
+        # env:
+        # Add deployment secrets here
+        # DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        # DOCKER_REGISTRY_URL: ${{ secrets.DOCKER_REGISTRY_URL }}

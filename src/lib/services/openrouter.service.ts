@@ -1,6 +1,12 @@
 import type { ChatCompletionOptions, ChatCompletionResult } from '@/openrouter.types';
 import { AuthenticationError, RateLimitError, NetworkError, ValidationError } from '@/openrouter.types';
 
+interface OpenRouterResponse {
+  error?: {
+    message: string;
+  };
+}
+
 export class OpenRouterService {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -50,7 +56,7 @@ export class OpenRouterService {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = (await response.json().catch(() => ({}))) as OpenRouterResponse;
 
       if (response.status === 401) {
         throw new AuthenticationError('Invalid API key');

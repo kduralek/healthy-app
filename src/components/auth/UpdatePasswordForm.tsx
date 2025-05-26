@@ -10,6 +10,13 @@ interface UpdatePasswordFormProps {
   errorMessage: string;
 }
 
+interface UpdatePasswordResponse {
+  message: string;
+  error?: {
+    message: string;
+  };
+}
+
 export function UpdatePasswordForm({ isCodeValid, errorMessage }: UpdatePasswordFormProps) {
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
@@ -75,7 +82,7 @@ export function UpdatePasswordForm({ isCodeValid, errorMessage }: UpdatePassword
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as UpdatePasswordResponse;
 
       if (!response.ok) {
         throw new Error(data.error?.message || 'Wystąpił problem z aktualizacją hasła');
