@@ -15,19 +15,26 @@ The Healthy Meal App is an innovative solution designed to help users customize 
 ## Getting Started Locally
 
 1. **Clone the repository:**
+
    ```bash
    git clone <repository-url>
    cd healthy-app
    ```
+
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
+
 3. **Ensure you are using Node version specified in `.nvmrc` (22.14.0):**
+
    ```bash
    nvm use
    ```
+
 4. **Run the development server:**
+
    ```bash
    npm run dev
    ```
@@ -41,6 +48,17 @@ The Healthy Meal App is an innovative solution designed to help users customize 
 - **lint:** Runs ESLint to analyze code quality.
 - **lint:fix:** Runs ESLint with the --fix option to automatically fix issues.
 - **format:** Formats the codebase using Prettier.
+- **test:e2e:** Runs end-to-end tests with Playwright (includes automatic database cleanup).
+
+## Testing
+
+The project includes end-to-end tests using Playwright with automatic database cleanup:
+
+- **E2E Tests:** Located in the `e2e/` directory
+- **Automatic Cleanup:** After all tests complete, the database is automatically cleaned up
+- **Configuration:** Tests require a `.env.test` file with Supabase credentials
+
+For detailed testing setup instructions, see [e2e/README.md](e2e/README.md).
 
 ## Project Scope
 

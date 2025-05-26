@@ -92,7 +92,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-              autoComplete="email"
+              autoComplete="off"
               required
               data-test-id="login-email-input"
             />
@@ -113,7 +113,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-              autoComplete="current-password"
+              autoComplete="off"
               required
               data-test-id="login-password-input"
             />
