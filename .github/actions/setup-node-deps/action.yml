@@ -1,19 +1,13 @@
 name: 'Setup Node.js and Dependencies'
 description: 'Setup Node.js with specified version and install npm dependencies'
 
-inputs:
-  node-version:
-    description: 'Node.js version to use'
-    required: true
-    default: '22.14.0'
-
 runs:
   using: 'composite'
   steps:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node-version }}
+        node-version-file: .nvmrc
         cache: 'npm'
 
     - name: Install dependencies
