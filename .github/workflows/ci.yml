@@ -56,9 +56,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Run unit tests
-        run: npm run test
-
       - name: Run unit tests with coverage
         run: npm run test:coverage
 

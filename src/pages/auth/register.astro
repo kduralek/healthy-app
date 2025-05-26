@@ -2,14 +2,11 @@
 import AuthLayout from '@/layouts/AuthLayout.astro';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 
-// Disable prerendering for this page
 export const prerender = false;
 
-// Get any return URL from the query string
-const returnUrl = Astro.url.searchParams.get('returnUrl') || '/app/recipes/generate';
-
-// If user is already logged in, redirect to the return URL
 if (Astro.locals.user) {
+  const returnUrl = Astro.url.searchParams.get('returnUrl') || '/app/recipes/generate';
+
   return Astro.redirect(returnUrl);
 }
 ---

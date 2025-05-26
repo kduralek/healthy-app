@@ -5,6 +5,13 @@ import { FormMessage } from './FormMessage';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 as SpinnerIcon } from 'lucide-react';
 
+interface ForgotPasswordResponse {
+  message: string;
+  error?: {
+    message: string;
+  };
+}
+
 export function ForgotPasswordForm() {
   const [email, setEmail] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
@@ -40,7 +47,7 @@ export function ForgotPasswordForm() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as ForgotPasswordResponse;
 
       if (!response.ok) {
         throw new Error(data.error?.message || 'Wystąpił problem z resetowaniem hasła');
