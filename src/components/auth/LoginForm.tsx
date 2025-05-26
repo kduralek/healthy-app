@@ -8,6 +8,15 @@ interface LoginFormProps {
   returnUrl?: string;
 }
 
+interface LoginResponse {
+  data?: {
+    redirectTo?: string;
+  };
+  error?: {
+    message?: string;
+  };
+}
+
 export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProps) {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -41,7 +50,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as LoginResponse;
 
       if (!response.ok) {
         // Handle error response
@@ -68,7 +77,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
         </CardDescription>
       </CardHeader>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} data-test-id="login-form">
         <CardContent className="space-y-4">
           {error && <FormMessage type="error">{error}</FormMessage>}
 
@@ -85,6 +94,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               autoComplete="email"
               required
+              data-test-id="login-email-input"
             />
           </div>
 
@@ -105,6 +115,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               autoComplete="current-password"
               required
+              data-test-id="login-password-input"
             />
           </div>
         </CardContent>
@@ -114,6 +125,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
             type="submit"
             className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
             disabled={isLoading}
+            data-test-id="login-submit-button"
           >
             {isLoading ? (
               <>

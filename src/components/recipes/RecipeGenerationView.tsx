@@ -10,7 +10,7 @@ export function RecipeGenerationView() {
   const { isLoading: isLoadingPreferences } = useUserPreferences();
 
   const content = (
-    <div className="space-y-8">
+    <div className="space-y-8" data-test-id="recipe-generation-content">
       {!state.recipeDraft ? (
         <RecipePromptForm onSubmit={generateRecipe} isLoading={state.isLoading} error={state.error} />
       ) : state.isLoading ? (

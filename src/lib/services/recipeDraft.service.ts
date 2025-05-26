@@ -1,13 +1,19 @@
 import type { RecipeDraftDTO } from '@/types';
 import { OpenRouterService } from './openrouter.service';
+import { MockOpenRouterService } from './openrouter.service.mock';
 
-const openRouter = new OpenRouterService(import.meta.env.OPENROUTER_API_KEY, {
-  defaultModel: 'gpt-4o-mini',
-  defaultParams: {
-    max_tokens: 1000,
-    temperature: 0.7,
-  },
-});
+// Use mock service in test environment
+const shouldUseMock = import.meta.env.USE_MOCK_OPENROUTER === 'true' || import.meta.env.NODE_ENV === 'test';
+
+const openRouter = shouldUseMock
+  ? new MockOpenRouterService()
+  : new OpenRouterService(import.meta.env.OPENROUTER_API_KEY, {
+      defaultModel: 'gpt-4o-mini',
+      defaultParams: {
+        max_tokens: 1000,
+        temperature: 0.7,
+      },
+    });
 
 const RECIPE_SYSTEM_PROMPT = `You are a professional chef and nutritionist. Generate a detailed, well-structured recipe based on the user's prompt.
 The recipe should include:

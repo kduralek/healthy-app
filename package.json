@@ -15,7 +15,8 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "test:component": "vitest --testNamePattern",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:preview": "playwright test --ui"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
