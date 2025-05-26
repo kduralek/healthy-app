@@ -30,18 +30,19 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // {
-    //   name: 'chromium',
-    //   use: { ...devices['Desktop Chrome'] },
-    // },
     {
-      name: 'cleanup db',
-      testMatch: /global\.teardown\.ts/,
+      name: 'setup db',
+      testMatch: /global\.setup\.ts/,
     },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      teardown: 'cleanup db',
+      dependencies: ['setup db'],
+    },
+    {
+      name: 'cleanup db',
+      testMatch: /global\.teardown\.ts/,
+      dependencies: ['chromium'],
     },
   ],
 

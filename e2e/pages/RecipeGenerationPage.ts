@@ -43,7 +43,7 @@ export class RecipeGenerationPage extends BasePage {
   async clickGenerateButton() {
     await this.page.click(this.generateButtonSelector);
     // Wait for the recipe to be generated
-    await this.page.waitForSelector(this.recipePreviewSelector, { state: 'visible', timeout: 30000 });
+    await this.page.waitForSelector(this.recipePreviewSelector, { state: 'visible', timeout: 10000 });
   }
 
   /**
