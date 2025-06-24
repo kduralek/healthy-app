@@ -5,10 +5,10 @@ import { BasePage } from './BasePage';
  */
 export class LoginPage extends BasePage {
   // Selectors
-  private readonly emailInputSelector = '[data-test-id="login-email-input"]';
-  private readonly passwordInputSelector = '[data-test-id="login-password-input"]';
-  private readonly submitButtonSelector = '[data-test-id="login-submit-button"]';
-  private readonly formSelector = '[data-test-id="login-form"]';
+  private readonly emailInputSelector = '[data-testid="login-email-input"]';
+  private readonly passwordInputSelector = '[data-testid="login-password-input"]';
+  private readonly submitButtonSelector = '[data-testid="login-submit-button"]';
+  private readonly formSelector = '[data-testid="login-form"]';
 
   /**
    * Navigate to the login page

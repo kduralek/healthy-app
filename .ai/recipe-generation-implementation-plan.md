@@ -9,6 +9,7 @@ Celem endpointu jest wygenerowanie szkicu przepisu na podstawie promptu przekaza
 - Metoda HTTP: POST
 - Struktura URL: /api/users/me/recipes/generate
 - Parametry:
+
   - Wymagane:
     - prompt (string) – zawiera prompt przepisu od użytkownika, minimum 10 znaków, maksimum 1000.
   - Opcjonalne: Brak
@@ -24,6 +25,7 @@ Celem endpointu jest wygenerowanie szkicu przepisu na podstawie promptu przekaza
 ## 3. Wykorzystywane typy
 
 - DTO:
+
   - `RecipeDraftDTO`:
     - title: string
     - content: string

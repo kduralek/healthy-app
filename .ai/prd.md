@@ -28,6 +28,7 @@ Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online 
 ## 5. Historyjki użytkowników
 
 - US-001: Rejestracja i logowanie oraz zarządzanie kontem
+
   - Opis: Jako nowy użytkownik chcę zarejestrować się, zalogować i mieć możliwość zmiany hasła, aby korzystać z aplikacji w sposób bezpieczny.
   - Kryteria akceptacji:
     - Dostępność formularza rejestracyjnego przyjmującego email i hasło.
@@ -36,6 +37,7 @@ Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online 
     - Walidacja danych (poprawny format email, minimalna długość hasła).
 
 - US-002: Konfiguracja preferencji żywieniowych
+
   - Opis: Jako użytkownik chcę ustawić i aktualizować swoje preferencje żywieniowe, aby aplikacja mogła generować przepisy zgodne z moimi potrzebami dietetycznymi.
   - Kryteria akceptacji:
     - Możliwość wyboru preferowanej diety oraz wskazania alergii.
@@ -43,6 +45,7 @@ Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online 
     - Intuicyjny interfejs umożliwiający łatwą wymianę ustawień.
 
 - US-003: Generowanie i modyfikacja przepisu przez AI
+
   - Opis: Jako użytkownik chcę wprowadzić prompt w języku polskim, aby system wygenerował przepis, który następnie może być modyfikowany przez AI w celu eliminacji niepożądanych składników.
   - Kryteria akceptacji:
     - Użytkownik ma dostęp do formularza wprowadzania promptu.
@@ -51,6 +54,7 @@ Użytkownicy często napotykają trudności przy adaptowaniu dostępnych online 
     - Użytkownik może zaakceptować lub odrzucić wygenerowany przepis.
 
 - US-004: Zarządzanie zapisanymi przepisami
+
   - Opis: Jako użytkownik chcę zapisywać, przeglądać oraz usuwać przepisy, aby mieć kontrolę nad moim zbiorem przepisów kulinarnych.
   - Kryteria akceptacji:
     - Przepis jest zapisywany w bazie danych po akceptacji przez użytkownika.

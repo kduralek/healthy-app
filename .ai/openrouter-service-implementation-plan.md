@@ -21,11 +21,14 @@ class OpenRouterService {
   private defaultModel: string;
   private defaultParams: Record<string, any>;
 
-  constructor(apiKey: string, options?: {
-    baseUrl?: string;
-    defaultModel?: string;
-    defaultParams?: Record<string, any>;
-  }) {
+  constructor(
+    apiKey: string,
+    options?: {
+      baseUrl?: string;
+      defaultModel?: string;
+      defaultParams?: Record<string, any>;
+    }
+  ) {
     // 1. Sprawdzenie apiKey (guard clause)
     if (!apiKey) throw new Error('OPENROUTER_API_KEY is required');
 
@@ -40,6 +43,7 @@ class OpenRouterService {
 ## 3. Publiczne metody i pola
 
 - **Pola:**
+
   - `defaultModel: string`
   - `defaultParams: Record<string, any>`
 
@@ -99,10 +103,22 @@ Dla każdego scenariusza:
 3. Stwórz plik `src/types.ts` z definicjami:
 
    ```ts
-   export interface Message { role: 'system' | 'user'; content: string; }
-   export interface ResponseFormat { type: 'json_schema'; json_schema: { name: string; strict: boolean; schema: Record<string, any> }; }
-   export interface ChatCompletionOptions { messages: Message[]; model?: string; params?: Record<string, any>; responseFormat?: ResponseFormat; }
-   export interface ChatCompletionResult { // dopasuj do schematu
+   export interface Message {
+     role: 'system' | 'user';
+     content: string;
+   }
+   export interface ResponseFormat {
+     type: 'json_schema';
+     json_schema: { name: string; strict: boolean; schema: Record<string, any> };
+   }
+   export interface ChatCompletionOptions {
+     messages: Message[];
+     model?: string;
+     params?: Record<string, any>;
+     responseFormat?: ResponseFormat;
+   }
+   export interface ChatCompletionResult {
+     // dopasuj do schematu
      [key: string]: any;
    }
    ```
@@ -114,12 +130,14 @@ Dla każdego scenariusza:
    ```ts
    import { OpenRouterService } from '~/lib/openrouterService';
    const service = new OpenRouterService(process.env.OPENROUTER_API_KEY!);
-   const result = await service.chatCompletion({ /* ... */ });
+   const result = await service.chatCompletion({
+     /* ... */
+   });
    ```
 
 7. Skonfiguruj monitorowanie i logowanie (np. Sentry, Logflare).
 8. Przetestuj end-to-end w staging.
-9. Wdróż na produkcję (GitHub Actions → DigitalOcean).  
+9. Wdróż na produkcję (GitHub Actions → DigitalOcean).
 
 ---
 
@@ -147,9 +165,9 @@ Dla każdego scenariusza:
        strict: true,
        schema: {
          temperature: { type: 'number' },
-         condition: { type: 'string' }
-       }
-     }
+         condition: { type: 'string' },
+       },
+     },
    };
    ```
 
@@ -167,7 +185,7 @@ Dla każdego scenariusza:
      messages: [systemMsg, userMsg],
      model: modelName,
      params: modelParams,
-     responseFormat
+     responseFormat,
    });
    console.log(result);
    ```

@@ -1,9 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { RecipePreview } from './RecipePreview';
-import type { RecipeDraftDTO } from '@/types';
 
-// Mocking child components for controlled testing
+// Setup component mocks BEFORE importing the component being tested - only for complex components
 vi.mock('./GenerationStats', () => ({
   GenerationStats: ({ generatedAt, generationDuration }: { generatedAt: string; generationDuration: number }) => (
     <div data-testid="generation-stats">
@@ -12,70 +10,11 @@ vi.mock('./GenerationStats', () => ({
   ),
 }));
 
-vi.mock('./SaveButton', () => ({
-  SaveButton: (props: {
-    onClick: () => Promise<void>;
-    isSaving: boolean;
-    disabled?: boolean;
-    saveSuccess?: boolean;
-  }) => (
-    <button
-      data-testid="save-button-mock"
-      onClick={props.onClick}
-      disabled={props.disabled || props.isSaving}
-      data-saving={props.isSaving ? 'true' : 'false'}
-      data-success={props.saveSuccess ? 'true' : 'false'}
-    >
-      {props.isSaving ? 'Zapisuję...' : props.saveSuccess ? 'Zapisano' : 'Zapisz przepis'}
-    </button>
-  ),
-}));
-
-vi.mock('@/components/ui/spinner', () => ({
-  Spinner: ({ size }: { size?: string }) => (
-    <div data-testid="spinner" data-size={size}>
-      Loading...
-    </div>
-  ),
-}));
-
-vi.mock('@/components/ui/alert', () => ({
-  Alert: ({ children, variant }: { children: React.ReactNode; variant?: string }) => (
-    <div data-testid="alert" role="alert" data-variant={variant}>
-      {children}
-    </div>
-  ),
-  AlertDescription: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="alert-description">{children}</div>
-  ),
-}));
-
-vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card" className={className}>
-      {children}
-    </div>
-  ),
-  CardHeader: ({ children }: { children: React.ReactNode }) => <div data-testid="card-header">{children}</div>,
-  CardTitle: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card-title" className={className}>
-      {children}
-    </div>
-  ),
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card-content" className={className}>
-      {children}
-    </div>
-  ),
-  CardFooter: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card-footer" className={className}>
-      {children}
-    </div>
-  ),
-}));
+import { RecipePreview } from './RecipePreview';
+import type { RecipeDraftDTO } from '@/types';
 
 describe('RecipePreview', () => {
-  // Mock data
+  // Test data
   const mockRecipeDraft: RecipeDraftDTO = {
     title: 'Test Recipe',
     content: 'This is a test recipe content.',
@@ -83,174 +22,200 @@ describe('RecipePreview', () => {
     generation_duration: 5000,
   };
 
-  const mockSave = vi.fn().mockResolvedValue(undefined);
-  const mockDiscard = vi.fn();
-
-  // Helper function for common render
-  const renderComponent = ({
-    recipeDraft = mockRecipeDraft,
-    onSave = mockSave,
-    onDiscard = mockDiscard,
-    isSaving = false,
-    saveError = null as string | null,
-    saveSuccess = false,
-    isLoadingPreferences = false,
-  } = {}) => {
-    return render(
-      <RecipePreview
-        recipeDraft={recipeDraft}
-        onSave={onSave}
-        onDiscard={onDiscard}
-        isSaving={isSaving}
-        saveError={saveError}
-        saveSuccess={saveSuccess}
-        isLoadingPreferences={isLoadingPreferences}
-      />
-    );
+  const defaultProps = {
+    recipeDraft: mockRecipeDraft,
+    onSave: vi.fn().mockResolvedValue(undefined),
+    onDiscard: vi.fn(),
+    isSaving: false,
+    saveError: null as string | null,
+    saveSuccess: false,
+    isLoadingPreferences: false,
   };
 
-  it('renders the recipe title and content correctly', () => {
-    renderComponent();
-
-    expect(screen.getByText('Test Recipe')).toBeInTheDocument();
-    expect(screen.getByText('This is a test recipe content.')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('passes correct props to GenerationStats component', () => {
-    renderComponent();
+  const renderComponent = (overrides = {}) => {
+    const props = { ...defaultProps, ...overrides };
+    return render(<RecipePreview {...props} />);
+  };
 
-    const statsElement = screen.getByTestId('generation-stats');
-    expect(statsElement).toHaveTextContent('2023-06-15T14:30:00Z-5000');
-  });
+  describe('Content Rendering', () => {
+    it('renders recipe title and content correctly', () => {
+      renderComponent();
 
-  it('shows loading preferences spinner when isLoadingPreferences is true', () => {
-    renderComponent({ isLoadingPreferences: true });
-
-    expect(screen.getByTestId('spinner')).toBeInTheDocument();
-    expect(screen.getByText('Ładowanie preferencji użytkownika...')).toBeInTheDocument();
-  });
-
-  it('does not show loading preferences message when isLoadingPreferences is false', () => {
-    renderComponent({ isLoadingPreferences: false });
-
-    expect(screen.queryByTestId('spinner')).not.toBeInTheDocument();
-    expect(screen.queryByText('Ładowanie preferencji użytkownika...')).not.toBeInTheDocument();
-  });
-
-  it('displays error alert when saveError is provided', () => {
-    const errorMessage = 'Failed to save recipe';
-    renderComponent({ saveError: errorMessage });
-
-    expect(screen.getByTestId('alert')).toBeInTheDocument();
-    expect(screen.getByTestId('alert-description')).toHaveTextContent(errorMessage);
-  });
-
-  it('does not display error alert when saveError is null', () => {
-    renderComponent({ saveError: null });
-
-    expect(screen.queryByTestId('alert')).not.toBeInTheDocument();
-  });
-
-  it('calls onDiscard when discard button is clicked', () => {
-    renderComponent();
-
-    fireEvent.click(screen.getByText('Odrzuć'));
-    expect(mockDiscard).toHaveBeenCalledTimes(1);
-  });
-
-  it('disables discard button when isSaving is true', () => {
-    renderComponent({ isSaving: true });
-
-    expect(screen.getByText('Odrzuć')).toBeDisabled();
-  });
-
-  it('passes correct props to SaveButton component', () => {
-    renderComponent({
-      isSaving: true,
-      saveSuccess: true,
-      isLoadingPreferences: false,
+      expect(screen.getByText('Test Recipe')).toBeInTheDocument();
+      expect(screen.getByText('This is a test recipe content.')).toBeInTheDocument();
     });
 
-    const saveButton = screen.getByTestId('save-button-mock');
-    expect(saveButton).toHaveAttribute('data-saving', 'true');
-    expect(saveButton).toHaveAttribute('data-success', 'true');
-    expect(saveButton).toBeDisabled();
+    it('passes correct props to GenerationStats component', () => {
+      renderComponent();
+
+      const statsElement = screen.getByTestId('generation-stats');
+      expect(statsElement).toHaveTextContent('2023-06-15T14:30:00Z-5000');
+    });
+
+    it('handles empty recipe content correctly', () => {
+      const emptyRecipe = { ...mockRecipeDraft, content: '' };
+      renderComponent({ recipeDraft: emptyRecipe });
+
+      expect(screen.getByText('Test Recipe')).toBeInTheDocument();
+      // Now we can use the real data-testid from component
+      const contentElement = screen.getByTestId('recipe-preview-content');
+      expect(contentElement).toBeInTheDocument();
+      expect(contentElement).toHaveTextContent('');
+    });
+
+    it('handles very long recipe titles correctly', () => {
+      const longTitleRecipe = { ...mockRecipeDraft, title: 'A'.repeat(100) };
+      renderComponent({ recipeDraft: longTitleRecipe });
+
+      expect(screen.getByText('A'.repeat(100))).toBeInTheDocument();
+    });
   });
 
-  it('disables SaveButton when isLoadingPreferences is true', () => {
-    renderComponent({ isLoadingPreferences: true });
+  describe('Loading States', () => {
+    it('shows loading preferences message when isLoadingPreferences is true', () => {
+      renderComponent({ isLoadingPreferences: true });
 
-    expect(screen.getByTestId('save-button-mock')).toBeDisabled();
+      // Real component shows "Ładowanie preferencji użytkownika..."
+      expect(screen.getByText('Ładowanie preferencji użytkownika...')).toBeInTheDocument();
+      // Check for spinner by class
+      expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    });
+
+    it('does not show loading preferences message when isLoadingPreferences is false', () => {
+      renderComponent();
+
+      expect(screen.queryByText('Ładowanie preferencji użytkownika...')).not.toBeInTheDocument();
+    });
   });
 
-  it('disables SaveButton when saveSuccess is true', () => {
-    renderComponent({ saveSuccess: true });
+  describe('Error States', () => {
+    it('displays error alert when saveError is provided', () => {
+      const errorMessage = 'Failed to save recipe';
+      renderComponent({ saveError: errorMessage });
 
-    expect(screen.getByTestId('save-button-mock')).toBeDisabled();
+      // Alert has role="alert" in real component
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    });
+
+    it('does not display error alert when saveError is null', () => {
+      renderComponent();
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('handles all possible error states correctly', () => {
+      // Test null error (no error)
+      renderComponent();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+      // Test empty string error (falsy value)
+      renderComponent({ saveError: '' });
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
-  it('calls onSave when save button is clicked', async () => {
-    renderComponent();
+  describe('User Interactions', () => {
+    it('calls onDiscard when discard button is clicked', () => {
+      const onDiscard = vi.fn();
+      renderComponent({ onDiscard });
 
-    fireEvent.click(screen.getByTestId('save-button-mock'));
-    expect(mockSave).toHaveBeenCalledTimes(1);
+      // Use role and name from real component
+      fireEvent.click(screen.getByRole('button', { name: /odrzuć/i }));
+      expect(onDiscard).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onSave when save button is clicked', () => {
+      const onSave = vi.fn().mockResolvedValue(undefined);
+      renderComponent({ onSave });
+
+      // Real SaveButton renders "Zapisz przepis" text
+      fireEvent.click(screen.getByRole('button', { name: /zapisz przepis/i }));
+      expect(onSave).toHaveBeenCalledTimes(1);
+    });
   });
 
-  // Edge case tests
-  it('handles empty recipe content correctly', () => {
-    const emptyContentRecipe = {
-      ...mockRecipeDraft,
-      content: '',
-    };
+  describe('Button States', () => {
+    it('disables discard button when isSaving is true', () => {
+      renderComponent({ isSaving: true });
 
-    renderComponent({ recipeDraft: emptyContentRecipe });
+      expect(screen.getByRole('button', { name: /odrzuć/i })).toBeDisabled();
+    });
 
-    // The component should still render without errors
-    expect(screen.getByText('Test Recipe')).toBeInTheDocument();
-    // Find the content div directly using the class name and data-testid approach
-    const contentDiv = screen.getByTestId('card-content').querySelector('.whitespace-pre-wrap');
-    expect(contentDiv).toBeInTheDocument();
-    expect(contentDiv).toHaveTextContent('');
+    it('disables SaveButton when isLoadingPreferences is true', () => {
+      renderComponent({ isLoadingPreferences: true });
+
+      expect(screen.getByRole('button', { name: /zapisz przepis/i })).toBeDisabled();
+    });
+
+    it('disables SaveButton when saveSuccess is true', () => {
+      renderComponent({ saveSuccess: true });
+
+      // When saveSuccess is true, button shows "Zapisano"
+      expect(screen.getByRole('button', { name: /zapisano/i })).toBeDisabled();
+    });
+
+    it('shows saving state correctly', () => {
+      renderComponent({ isSaving: true });
+
+      // When isSaving is true, button shows "Zapisuję..."
+      const savingButton = screen.getByRole('button', { name: /zapisuję/i });
+      expect(savingButton).toBeDisabled();
+      expect(savingButton).toHaveTextContent('Zapisuję...');
+    });
+
+    it('shows success state correctly', () => {
+      renderComponent({ saveSuccess: true });
+
+      // When saveSuccess is true, button shows "Zapisano"
+      const successButton = screen.getByRole('button', { name: /zapisano/i });
+      expect(successButton).toBeDisabled();
+      expect(successButton).toHaveTextContent('Zapisano');
+    });
   });
 
-  it('handles very long recipe titles correctly', () => {
-    const longTitleRecipe = {
-      ...mockRecipeDraft,
-      title: 'A'.repeat(100), // Very long title
-    };
+  describe('Business Logic', () => {
+    it('should disable save button when preferences are loading', () => {
+      renderComponent({ isLoadingPreferences: true });
 
-    renderComponent({ recipeDraft: longTitleRecipe });
+      expect(screen.getByRole('button', { name: /zapisz przepis/i })).toBeDisabled();
+      // Business rule: prevent saving when user preferences are still loading
+    });
 
-    // The component should handle long titles without breaking layout
-    expect(screen.getByText('A'.repeat(100))).toBeInTheDocument();
+    it('should show success state in save button after successful save', () => {
+      renderComponent({ saveSuccess: true });
+
+      const saveButton = screen.getByRole('button', { name: /zapisano/i });
+      expect(saveButton).toHaveTextContent('Zapisano');
+      // Business rule: indicate successful save operation to the user
+    });
+
+    it('should show saving state when save operation is in progress', () => {
+      renderComponent({ isSaving: true });
+
+      expect(screen.getByRole('button', { name: /zapisuję/i })).toHaveTextContent('Zapisuję...');
+      expect(screen.getByRole('button', { name: /odrzuć/i })).toBeDisabled();
+    });
   });
 
-  it('handles all possible error states correctly', () => {
-    // Testing with null error (no error)
-    renderComponent({ saveError: null });
-    expect(screen.queryByTestId('alert')).not.toBeInTheDocument();
+  describe('Edge Cases', () => {
+    it('handles different generation durations correctly', () => {
+      const fastRecipe = { ...mockRecipeDraft, generation_duration: 1000 };
+      renderComponent({ recipeDraft: fastRecipe });
 
-    // Testing with empty string error (falsy value, alert nie powinien być pokazany)
-    renderComponent({ saveError: '' as string });
-    expect(screen.queryByTestId('alert')).not.toBeInTheDocument();
+      expect(screen.getByTestId('generation-stats')).toHaveTextContent('1000');
+    });
 
-    // Testing with standard error message
-    renderComponent({ saveError: 'Error saving recipe' as string });
-    expect(screen.getByTestId('alert-description')).toHaveTextContent('Error saving recipe');
-  });
+    it('renders correctly with all loading states disabled', () => {
+      renderComponent();
 
-  // Business logic tests
-  it('should disable the save button when preferences are loading, following business rule', () => {
-    renderComponent({ isLoadingPreferences: true });
-
-    expect(screen.getByTestId('save-button-mock')).toBeDisabled();
-    // Business rule: prevent saving when user preferences are still loading
-  });
-
-  it('should show success state in save button after successful save, following business rule', () => {
-    renderComponent({ saveSuccess: true });
-
-    expect(screen.getByTestId('save-button-mock')).toHaveAttribute('data-success', 'true');
-    // Business rule: indicate successful save operation to the user
+      expect(screen.queryByText('Ładowanie preferencji użytkownika...')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /zapisz przepis/i })).not.toBeDisabled();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 });

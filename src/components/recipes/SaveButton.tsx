@@ -15,7 +15,7 @@ export function SaveButton({ onClick, isSaving, disabled, saveSuccess }: SaveBut
       disabled={disabled || isSaving}
       variant={saveSuccess ? 'secondary' : 'default'}
       className="min-w-[100px]"
-      data-test-id="save-recipe-button"
+      data-testid="save-recipe-button"
     >
       {isSaving ? (
         <>

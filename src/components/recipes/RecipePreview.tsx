@@ -26,7 +26,7 @@ export function RecipePreview({
   isLoadingPreferences = false,
 }: RecipePreviewProps) {
   return (
-    <Card className="w-full" data-test-id="recipe-preview-card">
+    <Card className="w-full" data-testid="recipe-preview-card">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{recipeDraft.title}</span>
@@ -38,7 +38,7 @@ export function RecipePreview({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="whitespace-pre-wrap" data-test-id="recipe-preview-content">
+        <div className="whitespace-pre-wrap" data-testid="recipe-preview-content">
           {recipeDraft.content}
         </div>
 
@@ -57,7 +57,7 @@ export function RecipePreview({
       </CardContent>
 
       <CardFooter className="flex justify-end gap-4">
-        <Button variant="outline" onClick={onDiscard} disabled={isSaving} data-test-id="discard-recipe-button">
+        <Button variant="outline" onClick={onDiscard} disabled={isSaving} data-testid="discard-recipe-button">
           Odrzuć
         </Button>
         <SaveButton

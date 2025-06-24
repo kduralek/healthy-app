@@ -21,7 +21,7 @@ projects: [
     use: { ...devices['Desktop Chrome'] },
     teardown: 'cleanup db',
   },
-]
+];
 ```
 
 ### Environment Variables Required

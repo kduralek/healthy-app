@@ -32,7 +32,7 @@ a) Testy jednostkowe (Vitest + React Testing Library)
 – Walidacje Zod
 
 b) Testy integracyjne (Testing Library/Hooks + MSW)
-– Endpointy /api/auth/*, /api/users/me/*
+– Endpointy /api/auth/_, /api/users/me/_
 – Logika middleware, odpowiedzi HTTP, statusy
 
 c) Testy end-to-end (Playwright)
@@ -75,10 +75,10 @@ g) Testy kontraktowe (MSW)
 - Wyświetlanie skeletonu podczas ładowania
 - Prezentacja podglądu przepisu
 - Obsługa błędów sieciowych
-  
+
 ### Middleware
 
-- Dostęp do /app/* bez logowania → przekierowanie
+- Dostęp do /app/\* bez logowania → przekierowanie
 - Dostęp do publicznych tras bez logowania
 
 ### Usługi
@@ -89,7 +89,7 @@ g) Testy kontraktowe (MSW)
 ### End-to-end
 
 - pełne ścieżki użytkownika
-- testowanie architektury islands w kontekście hydratacji komponentów 
+- testowanie architektury islands w kontekście hydratacji komponentów
 
 ## Harmonogram testów
 
