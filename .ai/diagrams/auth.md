@@ -1,7 +1,7 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    
+
     %% Participants definition
     participant User as User/Browser
     participant AstroPages as Astro Pages
@@ -10,11 +10,11 @@ sequenceDiagram
     participant APIEndpoints as API Endpoints
     participant SupabaseAuth as Supabase Auth
     participant Database as Supabase Database
-    
+
     %% Style settings
     rect rgb(240, 240, 240)
         Note over User,Database: User Registration Flow
-        
+
         %% Registration Flow
         User->>AstroPages: Access /auth/register
         AstroPages->>ReactForms: Render RegisterForm
@@ -30,10 +30,10 @@ sequenceDiagram
         APIEndpoints-->>ReactForms: Response with status
         ReactForms-->>User: Show confirmation message
     end
-    
+
     rect rgb(240, 250, 240)
         Note over User,Database: User Login Flow
-        
+
         %% Login Flow
         User->>AstroPages: Access /auth/login
         AstroPages->>ReactForms: Render LoginForm
@@ -41,7 +41,7 @@ sequenceDiagram
         User->>ReactForms: Enter credentials
         ReactForms->>APIEndpoints: POST /api/auth/login
         APIEndpoints->>SupabaseAuth: supabase.auth.signInWithPassword()
-        
+
         alt Authentication successful
             SupabaseAuth->>SupabaseAuth: Generate JWT tokens
             SupabaseAuth-->>APIEndpoints: Return tokens and user data
@@ -53,16 +53,16 @@ sequenceDiagram
             ReactForms-->>User: Display error message
         end
     end
-    
+
     rect rgb(250, 240, 240)
         Note over User,Database: Session Management
-        
+
         %% Session Validation (happens on protected routes)
         User->>AstroPages: Access protected route
         AstroPages->>AstroMiddleware: Route request
         activate AstroMiddleware
         AstroMiddleware->>SupabaseAuth: getSupabaseSession()
-        
+
         alt Valid session
             SupabaseAuth-->>AstroMiddleware: Return valid session
             AstroMiddleware->>AstroPages: Allow access to protected route
@@ -74,10 +74,10 @@ sequenceDiagram
         end
         deactivate AstroMiddleware
     end
-    
+
     rect rgb(240, 240, 250)
         Note over User,Database: Password Reset Flow
-        
+
         %% Reset Password Flow
         User->>AstroPages: Access /auth/login
         AstroPages->>ReactForms: Render LoginForm
@@ -89,7 +89,7 @@ sequenceDiagram
         ReactForms->>APIEndpoints: POST /api/auth/reset-password
         APIEndpoints->>SupabaseAuth: supabase.auth.resetPasswordForEmail()
         SupabaseAuth->>User: Send password reset email
-        
+
         User->>User: Open email and click reset link
         User->>AstroPages: Access /auth/new-password with token
         AstroPages->>ReactForms: Render NewPasswordForm
@@ -102,10 +102,10 @@ sequenceDiagram
         ReactForms->>AstroPages: Redirect to login page
         AstroPages->>User: Show login form with success message
     end
-    
+
     rect rgb(250, 250, 240)
         Note over User,Database: Change Password Flow (Authenticated User)
-        
+
         %% Change Password Flow
         User->>AstroPages: Access /profile
         AstroMiddleware->>SupabaseAuth: Verify session
@@ -116,7 +116,7 @@ sequenceDiagram
         ReactForms->>User: Display change password form
         User->>ReactForms: Enter current and new passwords
         ReactForms->>APIEndpoints: POST /api/auth/change-password
-        
+
         APIEndpoints->>SupabaseAuth: Verify current password
         alt Current password verified
             APIEndpoints->>SupabaseAuth: supabase.auth.updateUser()
@@ -130,10 +130,10 @@ sequenceDiagram
             ReactForms-->>User: Show error message
         end
     end
-    
+
     rect rgb(240, 250, 250)
         Note over User,Database: Logout Flow
-        
+
         %% Logout Flow
         User->>ReactForms: Click logout in UserNav
         ReactForms->>APIEndpoints: POST /api/auth/logout
@@ -144,16 +144,16 @@ sequenceDiagram
         ReactForms->>AstroPages: Redirect to home
         AstroPages->>User: Show home page (unauthenticated)
     end
-    
+
     rect rgb(250, 240, 250)
         Note over User,Database: Token Refresh Flow
-        
+
         %% Token Refresh Flow (happens automatically)
         User->>AstroPages: Access any page with expired access token
         AstroPages->>AstroMiddleware: Route request
         AstroMiddleware->>SupabaseAuth: getSupabaseSession()
         SupabaseAuth->>SupabaseAuth: Detect expired access token
-        
+
         alt Valid refresh token
             SupabaseAuth->>SupabaseAuth: Use refresh token to get new access token
             SupabaseAuth->>SupabaseAuth: Update tokens in storage
@@ -166,4 +166,4 @@ sequenceDiagram
             AstroPages->>User: Show login page
         end
     end
-``` 
+```

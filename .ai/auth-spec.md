@@ -125,15 +125,12 @@ Wykorzystamy API Endpoints Astro zintegrowane z Supabase:
 - `POST /api/auth/register` - rejestracja użytkownika
   - Parametry: `email`, `password`
   - Odpowiedź: status operacji, ew. błędy
-  
 - `POST /api/auth/login` - logowanie użytkownika
   - Parametry: `email`, `password`
   - Odpowiedź: token JWT, dane użytkownika, ew. błędy
-  
 - `POST /api/auth/reset-password` - żądanie resetowania hasła
   - Parametry: `email`
   - Odpowiedź: status operacji
-  
 - `POST /api/auth/new-password` - ustawienie nowego hasła
   - Parametry: `token`, `password`
   - Odpowiedź: status operacji, ew. błędy
@@ -143,7 +140,6 @@ Wykorzystamy API Endpoints Astro zintegrowane z Supabase:
 - `POST /api/auth/change-password` - zmiana hasła
   - Parametry: `currentPassword`, `newPassword`
   - Odpowiedź: status operacji, ew. błędy
-  
 - `POST /api/auth/logout` - wylogowanie
   - Odpowiedź: status operacji
 
@@ -156,22 +152,21 @@ Middleware Astro zostanie rozszerzone o funkcjonalność weryfikacji sesji użyt
 export const onRequest = async (context, next) => {
   // Pobieranie i weryfikacja sesji z Supabase
   const { session, supabaseClient } = await getSupabaseSession(context.request);
-  
+
   // Ustawienie informacji o sesji w locals dla użycia w komponentach
   context.locals.session = session;
   context.locals.supabase = supabaseClient;
-  
+
   // Sprawdzenie, czy ścieżka wymaga autoryzacji
-  const isProtectedRoute = context.url.pathname.startsWith('/profile') || 
-                           context.url.pathname.startsWith('/app');
-                           
+  const isProtectedRoute = context.url.pathname.startsWith('/profile') || context.url.pathname.startsWith('/app');
+
   if (isProtectedRoute && !session) {
     // Przekierowanie na stronę logowania z parametrem returnUrl
-    return Response.redirect(new URL('/auth/login?returnUrl=' + 
-                           encodeURIComponent(context.url.pathname), 
-                           context.url.origin));
+    return Response.redirect(
+      new URL('/auth/login?returnUrl=' + encodeURIComponent(context.url.pathname), context.url.origin)
+    );
   }
-  
+
   // Sprawdzenie, czy ścieżka autentykacji nie powinna być dostępna dla zalogowanych
   const isAuthRoute = context.url.pathname.startsWith('/auth');
 
@@ -179,7 +174,7 @@ export const onRequest = async (context, next) => {
     // Przekierowanie na stronę główną
     return Response.redirect(new URL('/', context.url.origin));
   }
-  
+
   return next();
 };
 ```
@@ -204,7 +199,7 @@ export const onRequest = async (context, next) => {
     error?: {
       code: string;
       message: string;
-    }
+    };
   }
   ```
 
@@ -232,25 +227,23 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Helper do pobierania sesji w middleware/komponentach
 export const getSupabaseSession = async (request) => {
-  const supabaseClient = createClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      auth: {
-        flowType: 'pkce',
-        autoRefreshToken: true,
-        detectSessionInUrl: false,
-        persistSession: true,
+  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      flowType: 'pkce',
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      persistSession: true,
+    },
+    global: {
+      headers: {
+        cookie: request.headers.get('cookie') || '',
       },
-      global: {
-        headers: {
-          cookie: request.headers.get('cookie') || '',
-        },
-      },
-    }
-  );
-  
-  const { data: { session } } = await supabaseClient.auth.getSession();
+    },
+  });
+
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
   return { session, supabaseClient };
 };
 ```
@@ -311,12 +304,12 @@ export interface ChangePasswordFormData {
 ```typescript
 // /src/lib/auth.ts
 import { supabase } from '../db/supabase';
-import type { 
-  LoginFormData, 
-  RegisterFormData, 
+import type {
+  LoginFormData,
+  RegisterFormData,
   ResetPasswordFormData,
   NewPasswordFormData,
-  ChangePasswordFormData
+  ChangePasswordFormData,
 } from '../types';
 
 export const authService = {
@@ -330,7 +323,7 @@ export const authService = {
       },
     });
   },
-  
+
   // Logowanie użytkownika
   async login({ email, password }: LoginFormData) {
     return await supabase.auth.signInWithPassword({
@@ -338,49 +331,52 @@ export const authService = {
       password,
     });
   },
-  
+
   // Wylogowanie użytkownika
   async logout() {
     return await supabase.auth.signOut();
   },
-  
+
   // Żądanie resetu hasła
   async resetPassword({ email }: ResetPasswordFormData) {
     return await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/new-password`,
     });
   },
-  
+
   // Ustawienie nowego hasła
   async setNewPassword({ password }: NewPasswordFormData) {
     return await supabase.auth.updateUser({
       password,
     });
   },
-  
+
   // Zmiana hasła zalogowanego użytkownika
   async changePassword({ currentPassword, newPassword }: ChangePasswordFormData) {
     // Najpierw weryfikacja aktualnego hasła (przez ponowne logowanie)
-    const { data: { user }, error: loginError } = await supabase.auth.signInWithPassword({
+    const {
+      data: { user },
+      error: loginError,
+    } = await supabase.auth.signInWithPassword({
       email: supabase.auth.getUser().then(({ data }) => data.user?.email || ''),
       password: currentPassword,
     });
-    
+
     if (loginError) {
       return { error: loginError };
     }
-    
+
     // Zmiana hasła
     return await supabase.auth.updateUser({
       password: newPassword,
     });
   },
-  
+
   // Pobieranie aktualnej sesji
   async getSession() {
     return await supabase.auth.getSession();
   },
-  
+
   // Pobieranie danych zalogowanego użytkownika
   async getUser() {
     return await supabase.auth.getUser();
@@ -396,9 +392,9 @@ export const authService = {
 // /astro.config.mjs
 export default defineConfig({
   // ... istniejąca konfiguracja
-  
+
   output: 'server', // Tryb SSR dla obsługi dynamicznych treści i autoryzacji
-  
+
   // Konfiguracja dla obsługi autentykacji
   vite: {
     define: {

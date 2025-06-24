@@ -5,16 +5,16 @@ import { BasePage } from './BasePage';
  */
 export class RecipeGenerationPage extends BasePage {
   // Selectors
-  private readonly contentSelector = '[data-test-id="recipe-generation-content"]';
-  private readonly promptFormSelector = '[data-test-id="recipe-prompt-form"]';
-  private readonly promptInputSelector = '[data-test-id="recipe-prompt-input"]';
-  private readonly generateButtonSelector = '[data-test-id="generate-recipe-button"]';
+  private readonly contentSelector = '[data-testid="recipe-generation-content"]';
+  private readonly promptFormSelector = '[data-testid="recipe-prompt-form"]';
+  private readonly promptInputSelector = '[data-testid="recipe-prompt-input"]';
+  private readonly generateButtonSelector = '[data-testid="generate-recipe-button"]';
 
   // Recipe preview selectors
-  private readonly recipePreviewSelector = '[data-test-id="recipe-preview-card"]';
-  private readonly recipeContentSelector = '[data-test-id="recipe-preview-content"]';
-  private readonly saveButtonSelector = '[data-test-id="save-recipe-button"]';
-  private readonly discardButtonSelector = '[data-test-id="discard-recipe-button"]';
+  private readonly recipePreviewSelector = '[data-testid="recipe-preview-card"]';
+  private readonly recipeContentSelector = '[data-testid="recipe-preview-content"]';
+  private readonly saveButtonSelector = '[data-testid="save-recipe-button"]';
+  private readonly discardButtonSelector = '[data-testid="discard-recipe-button"]';
 
   /**
    * Navigate to the recipe generation page
@@ -43,7 +43,10 @@ export class RecipeGenerationPage extends BasePage {
   async clickGenerateButton() {
     await this.page.click(this.generateButtonSelector);
     // Wait for the recipe to be generated
-    await this.page.waitForSelector(this.recipePreviewSelector, { state: 'visible', timeout: 10000 });
+    await this.page.waitForSelector(this.recipePreviewSelector, {
+      state: 'visible',
+      timeout: 10000,
+    });
   }
 
   /**
@@ -86,7 +89,9 @@ export class RecipeGenerationPage extends BasePage {
   async clickDiscardButton() {
     await this.page.click(this.discardButtonSelector);
     // Wait for the form to reappear
-    await this.page.waitForSelector(this.promptFormSelector, { state: 'visible' });
+    await this.page.waitForSelector(this.promptFormSelector, {
+      state: 'visible',
+    });
   }
 
   /**

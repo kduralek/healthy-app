@@ -77,7 +77,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
         </CardDescription>
       </CardHeader>
 
-      <form onSubmit={handleSubmit} data-test-id="login-form">
+      <form onSubmit={handleSubmit} data-testid="login-form">
         <CardContent className="space-y-4">
           {error && <FormMessage type="error">{error}</FormMessage>}
 
@@ -94,7 +94,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               autoComplete="off"
               required
-              data-test-id="login-email-input"
+              data-testid="login-email-input"
             />
           </div>
 
@@ -115,7 +115,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
               className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               autoComplete="off"
               required
-              data-test-id="login-password-input"
+              data-testid="login-password-input"
             />
           </div>
         </CardContent>
@@ -125,7 +125,7 @@ export function LoginForm({ returnUrl = '/app/recipes/generate' }: LoginFormProp
             type="submit"
             className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
             disabled={isLoading}
-            data-test-id="login-submit-button"
+            data-testid="login-submit-button"
           >
             {isLoading ? (
               <>
@@ -159,6 +159,7 @@ const SpinnerIcon = ({ className }: { className?: string }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
+    aria-label="Ładowanie"
   >
     <path d="M21 12a9 9 0 1 1-6.219-8.56" />
   </svg>

@@ -49,7 +49,10 @@ async function setupAuthenticatedPage(page: Page, callback: (page: RecipeGenerat
   // Wait for redirection to complete - be more flexible with URL pattern
   await page.waitForURL('**/app/recipes/generate', { timeout: 10000 });
 
-  await page.waitForSelector('[data-test-id="recipe-generation-content"]', { state: 'visible', timeout: 10000 });
+  await page.waitForSelector('[data-testid="recipe-generation-content"]', {
+    state: 'visible',
+    timeout: 10000,
+  });
 
   // Additional check to ensure the page is fully loaded
   await recipeGenerationPage.isLoaded();

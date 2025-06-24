@@ -81,12 +81,12 @@ RecipeGenerationView (strona główna)
 
 ```typescript
 interface RecipeGenerationState {
-  isLoading: boolean;          // Stan ładowania podczas generowania przepisu
-  error: string | null;        // Komunikat błędu (jeśli wystąpił)
-  recipeDraft: RecipeDraftDTO | null;  // Wygenerowany przepis
-  isSaving: boolean;           // Stan ładowania podczas zapisywania
-  saveError: string | null;    // Błąd zapisywania (jeśli wystąpił)
-  saveSuccess: boolean;        // Flaga powodzenia zapisywania
+  isLoading: boolean; // Stan ładowania podczas generowania przepisu
+  error: string | null; // Komunikat błędu (jeśli wystąpił)
+  recipeDraft: RecipeDraftDTO | null; // Wygenerowany przepis
+  isSaving: boolean; // Stan ładowania podczas zapisywania
+  saveError: string | null; // Błąd zapisywania (jeśli wystąpił)
+  saveSuccess: boolean; // Flaga powodzenia zapisywania
 }
 ```
 
@@ -94,9 +94,9 @@ interface RecipeGenerationState {
 
 ```typescript
 interface RecipePromptFormState {
-  prompt: string;              // Treść promptu wprowadzona przez użytkownika
-  isValid: boolean;            // Czy prompt spełnia wymagania walidacji
-  error: string | null;        // Komunikat błędu walidacji (jeśli wystąpił)
+  prompt: string; // Treść promptu wprowadzona przez użytkownika
+  isValid: boolean; // Czy prompt spełnia wymagania walidacji
+  error: string | null; // Komunikat błędu walidacji (jeśli wystąpił)
 }
 ```
 
@@ -104,8 +104,8 @@ interface RecipePromptFormState {
 
 ```typescript
 interface PromptFormProps {
-  onSubmit: (prompt: string) => Promise<void>;  // Callback wywoływany po zatwierdzeniu formularza
-  isLoading: boolean;          // Czy trwa proces generowania przepisu
+  onSubmit: (prompt: string) => Promise<void>; // Callback wywoływany po zatwierdzeniu formularza
+  isLoading: boolean; // Czy trwa proces generowania przepisu
 }
 ```
 
@@ -113,12 +113,12 @@ interface PromptFormProps {
 
 ```typescript
 interface RecipePreviewProps {
-  recipeDraft: RecipeDraftDTO;  // Wygenerowany przepis do wyświetlenia
-  onSave: () => Promise<void>;  // Callback zapisywania przepisu
-  onDiscard: () => void;        // Callback odrzucania przepisu
-  isSaving: boolean;            // Czy trwa proces zapisywania
-  saveError: string | null;     // Błąd zapisywania (jeśli wystąpił)
-  saveSuccess: boolean;         // Flaga powodzenia zapisywania
+  recipeDraft: RecipeDraftDTO; // Wygenerowany przepis do wyświetlenia
+  onSave: () => Promise<void>; // Callback zapisywania przepisu
+  onDiscard: () => void; // Callback odrzucania przepisu
+  isSaving: boolean; // Czy trwa proces zapisywania
+  saveError: string | null; // Błąd zapisywania (jeśli wystąpił)
+  saveSuccess: boolean; // Flaga powodzenia zapisywania
 }
 ```
 
@@ -126,9 +126,9 @@ interface RecipePreviewProps {
 
 ```typescript
 interface SaveButtonProps {
-  onClick: () => Promise<void>;  // Callback wywoływany po kliknięciu przycisku
-  isSaving: boolean;             // Czy trwa proces zapisywania
-  disabled?: boolean;            // Czy przycisk powinien być nieaktywny
+  onClick: () => Promise<void>; // Callback wywoływany po kliknięciu przycisku
+  isSaving: boolean; // Czy trwa proces zapisywania
+  disabled?: boolean; // Czy przycisk powinien być nieaktywny
 }
 ```
 
@@ -136,8 +136,8 @@ interface SaveButtonProps {
 
 ```typescript
 interface GenerationStatsProps {
-  generatedAt: string;           // Data wygenerowania przepisu
-  generationDuration: number;    // Czas generowania przepisu (w ms)
+  generatedAt: string; // Data wygenerowania przepisu
+  generationDuration: number; // Czas generowania przepisu (w ms)
 }
 ```
 
@@ -153,31 +153,31 @@ function useRecipeGeneration() {
     recipeDraft: null,
     isSaving: false,
     saveError: null,
-    saveSuccess: false
+    saveSuccess: false,
   });
 
   // Generowanie przepisu na podstawie promptu
   const generateRecipe = async (prompt: string) => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
     try {
       const response = await fetch('/api/users/me/recipes/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Wystąpił błąd podczas generowania przepisu');
       }
-      
+
       const recipeDraft = await response.json();
-      setState(prev => ({ ...prev, isLoading: false, recipeDraft }));
+      setState((prev) => ({ ...prev, isLoading: false, recipeDraft }));
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        error: error instanceof Error ? error.message : 'Wystąpił nieznany błąd' 
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Wystąpił nieznany błąd',
       }));
     }
   };
@@ -185,8 +185,8 @@ function useRecipeGeneration() {
   // Zapisywanie przepisu w bazie danych
   const saveRecipe = async () => {
     if (!state.recipeDraft) return;
-    
-    setState(prev => ({ ...prev, isSaving: true, saveError: null }));
+
+    setState((prev) => ({ ...prev, isSaving: true, saveError: null }));
     try {
       // Tutaj należy dodać logikę pobierania preferencji użytkownika (diets, allergens)
       // i dodania ich do danych przepisu
@@ -194,37 +194,37 @@ function useRecipeGeneration() {
         title: state.recipeDraft.title,
         content: state.recipeDraft.content,
         diets: [], // Preferencje do pobrania z API lub stanu aplikacji
-        allergens: [] // Preferencje do pobrania z API lub stanu aplikacji
+        allergens: [], // Preferencje do pobrania z API lub stanu aplikacji
       };
-      
+
       const response = await fetch('/api/users/me/recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createRecipeCommand)
+        body: JSON.stringify(createRecipeCommand),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Wystąpił błąd podczas zapisywania przepisu');
       }
-      
-      setState(prev => ({ ...prev, isSaving: false, saveSuccess: true }));
+
+      setState((prev) => ({ ...prev, isSaving: false, saveSuccess: true }));
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        isSaving: false, 
-        saveError: error instanceof Error ? error.message : 'Wystąpił nieznany błąd' 
+      setState((prev) => ({
+        ...prev,
+        isSaving: false,
+        saveError: error instanceof Error ? error.message : 'Wystąpił nieznany błąd',
       }));
     }
   };
 
   // Odrzucanie wygenerowanego przepisu
   const discardRecipe = () => {
-    setState(prev => ({ 
-      ...prev, 
-      recipeDraft: null, 
-      saveSuccess: false, 
-      saveError: null 
+    setState((prev) => ({
+      ...prev,
+      recipeDraft: null,
+      saveSuccess: false,
+      saveError: null,
     }));
   };
 
@@ -239,20 +239,20 @@ function usePromptForm(onSubmit: (prompt: string) => Promise<void>) {
   const [state, setState] = useState<RecipePromptFormState>({
     prompt: '',
     isValid: false,
-    error: null
+    error: null,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const prompt = e.target.value;
     const isValid = prompt.trim().length >= 10; // Minimalna długość promptu
     const error = isValid ? null : 'Prompt powinien zawierać co najmniej 10 znaków';
-    
+
     setState({ prompt, isValid, error });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (state.isValid) {
       await onSubmit(state.prompt);
     }
@@ -356,35 +356,43 @@ function usePromptForm(onSubmit: (prompt: string) => Promise<void>) {
 ## 11. Kroki implementacji
 
 1. **Utworzenie struktury plików**
+
    - Utworzenie pliku `src/pages/recipes/generate.astro`
    - Utworzenie plików komponentów React
 
 2. **Implementacja podstawowych komponentów**
+
    - Implementacja `Spinner`
    - Implementacja `SaveButton`
    - Implementacja `GenerationStats`
 
 3. **Implementacja typów**
+
    - Zdefiniowanie wszystkich niezbędnych interfejsów i typów
 
 4. **Implementacja custom hooków**
+
    - Implementacja `useRecipeGeneration`
    - Implementacja `usePromptForm`
 
 5. **Implementacja głównych komponentów**
+
    - Implementacja `RecipePromptForm`
    - Implementacja `RecipePreview`
    - Implementacja `RecipeGenerationView`
 
 6. **Integracja z API**
+
    - Implementacja funkcji wywołujących endpointy API
    - Implementacja obsługi odpowiedzi i błędów
 
 7. **Integracja widoku z layoutem**
+
    - Osadzenie widoku w stronie Astro
    - Dodanie nagłówka i nawigacji
 
 8. **Testowanie i debugowanie**
+
    - Weryfikacja przepływu generowania przepisu
    - Testowanie obsługi błędów
    - Testowanie responsywności
