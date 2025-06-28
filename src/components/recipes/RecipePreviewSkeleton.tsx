@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function RecipePreviewSkeleton() {
   return (
-    <Card className="w-full">
+    <Card className="w-full" data-testid="recipe-preview-skeleton">
       <CardHeader className="space-y-2">
         <div className="flex items-center justify-between">
           <Skeleton className="h-8 w-1/3" />

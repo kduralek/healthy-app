@@ -15,45 +15,136 @@ export class LoginPage extends BasePage {
    */
   async goto() {
     await super.goto('/auth/login');
+    // Wait for the page to be fully loaded and React to be hydrated
+    await this.waitForPageReady();
   }
 
   /**
-   * Fill in the login form
+   * Wait for the page to be fully loaded and React component to be hydrated
+   */
+  private async waitForPageReady() {
+    // 1. Wait for network to be idle (all resources loaded)
+    await this.page.waitForLoadState('networkidle');
+
+    // 2. Wait for the form to be present and attached to DOM
+    await this.page.waitForSelector(this.formSelector, { state: 'attached' });
+
+    // 3. Wait for React hydration to complete by checking if inputs are interactive
+    await this.page.waitForFunction(
+      () => {
+        const emailInput = document.querySelector('[data-testid="login-email-input"]') as HTMLInputElement;
+        const passwordInput = document.querySelector('[data-testid="login-password-input"]') as HTMLInputElement;
+
+        // Check if elements exist and are not disabled (React has taken control)
+        return (
+          emailInput &&
+          passwordInput &&
+          !emailInput.disabled &&
+          !passwordInput.disabled &&
+          // Ensure the elements are truly interactive
+          emailInput.type === 'email' &&
+          passwordInput.type === 'password'
+        );
+      },
+      { timeout: 10000 }
+    );
+
+    // 4. Additional wait for component stability
+    await this.page.waitForTimeout(500);
+  }
+
+  /**
+   * Fill in the login form with improved stability
    */
   async fillLoginForm(email: string, password: string) {
-    // Wait for form to be fully loaded and interactive
+    // Ensure the form is ready for interaction
+    await this.waitForFormInteractivity();
+
+    // Fill email field with retries
+    await this.fillInputWithRetry(this.emailInputSelector, email, 'email');
+
+    // Fill password field with retries
+    await this.fillInputWithRetry(this.passwordInputSelector, password, 'password');
+
+    // Final verification that both fields are still filled
+    await this.verifyFieldsAreFilled(email, password);
+  }
+
+  /**
+   * Wait for form to be fully interactive
+   */
+  private async waitForFormInteractivity() {
+    // Wait for form to be visible and interactive
     await this.page.waitForSelector(this.formSelector, { state: 'visible' });
 
-    // Clear and fill email field
-    await this.page.click(this.emailInputSelector);
-    await this.page.fill(this.emailInputSelector, email);
+    // Wait for input fields to be enabled and ready
+    await this.page.waitForSelector(this.emailInputSelector, { state: 'visible' });
+    await this.page.waitForSelector(this.passwordInputSelector, { state: 'visible' });
 
-    // Wait a bit to ensure email is properly set
-    await this.page.waitForTimeout(100);
+    // Ensure inputs are not disabled
+    await this.page.waitForFunction(() => {
+      const emailInput = document.querySelector('[data-testid="login-email-input"]') as HTMLInputElement;
+      const passwordInput = document.querySelector('[data-testid="login-password-input"]') as HTMLInputElement;
+      return emailInput && passwordInput && !emailInput.disabled && !passwordInput.disabled;
+    });
+  }
 
-    // Verify email was filled correctly
-    const emailValue = await this.page.inputValue(this.emailInputSelector);
-    if (emailValue !== email) {
-      throw new Error(`Email field not filled correctly. Expected: ${email}, Got: ${emailValue}`);
+  /**
+   * Fill an input field with retry logic to handle React re-renders
+   */
+  private async fillInputWithRetry(selector: string, value: string, fieldName: string, maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Clear and fill the field
+        await this.page.click(selector);
+        await this.page.fill(selector, ''); // Clear first
+        await this.page.fill(selector, value);
+
+        // Wait for the value to be set
+        await this.page.waitForFunction(
+          ({ selector, expectedValue }) => {
+            const input = document.querySelector(selector) as HTMLInputElement;
+            return input && input.value === expectedValue;
+          },
+          { selector, expectedValue: value },
+          { timeout: 2000 }
+        );
+
+        // Verify the value is still there after a brief moment
+        await this.page.waitForTimeout(200);
+        const currentValue = await this.page.inputValue(selector);
+
+        if (currentValue === value) {
+          return; // Success
+        } else {
+          throw new Error(`Value was reset. Expected: ${value}, Got: ${currentValue}`);
+        }
+      } catch (error) {
+        if (attempt === maxRetries) {
+          throw new Error(
+            `Failed to fill ${fieldName} field after ${maxRetries} attempts. Last error: ${error.message}`
+          );
+        }
+
+        console.warn(`Attempt ${attempt} failed for ${fieldName} field, retrying...`);
+        await this.page.waitForTimeout(1000); // Wait before retry
+      }
     }
+  }
 
-    // Clear and fill password field
-    await this.page.click(this.passwordInputSelector);
-    await this.page.fill(this.passwordInputSelector, password);
-
-    // Wait a bit to ensure password is properly set
-    await this.page.waitForTimeout(100);
-
-    // Verify both fields are still filled
-    const finalEmailValue = await this.page.inputValue(this.emailInputSelector);
+  /**
+   * Verify that both email and password fields are filled correctly
+   */
+  private async verifyFieldsAreFilled(expectedEmail: string, expectedPassword: string) {
+    const emailValue = await this.page.inputValue(this.emailInputSelector);
     const passwordValue = await this.page.inputValue(this.passwordInputSelector);
 
-    if (finalEmailValue !== email) {
-      throw new Error(`Email field was cleared after filling password. Expected: ${email}, Got: ${finalEmailValue}`);
+    if (emailValue !== expectedEmail) {
+      throw new Error(`Email field verification failed. Expected: ${expectedEmail}, Got: ${emailValue}`);
     }
 
-    if (passwordValue !== password) {
-      throw new Error(`Password field not filled correctly. Expected: ${password}, Got: ${passwordValue}`);
+    if (passwordValue !== expectedPassword) {
+      throw new Error(`Password field verification failed. Expected: ${expectedPassword}, Got: ${passwordValue}`);
     }
   }
 
@@ -61,6 +152,8 @@ export class LoginPage extends BasePage {
    * Submit the login form
    */
   async submitLoginForm() {
+    // Ensure button is clickable
+    await this.page.waitForSelector(this.submitButtonSelector, { state: 'visible' });
     await this.page.click(this.submitButtonSelector);
   }
 
