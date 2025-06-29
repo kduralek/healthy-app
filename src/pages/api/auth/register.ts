@@ -1,26 +1,8 @@
 import type { APIRoute } from 'astro';
-import { z } from 'zod';
 import { createSupabaseServerClient } from '@/db/supabase.client';
+import { registerFormSchema } from '@/lib/schemas/auth.schema';
 
-// Disable prerendering for API routes
 export const prerender = false;
-
-// Registration request schema
-const registerSchema = z
-  .object({
-    email: z.string().email('Podaj poprawny adres e-mail'),
-    password: z
-      .string()
-      .min(8, 'Hasło musi mieć co najmniej 8 znaków')
-      .regex(/[A-Z]/, 'Hasło musi zawierać co najmniej jedną wielką literę')
-      .regex(/[0-9]/, 'Hasło musi zawierać co najmniej jedną cyfrę')
-      .regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/, 'Hasło musi zawierać co najmniej jeden znak specjalny'),
-    passwordConfirm: z.string(),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    message: 'Hasła nie są identyczne',
-    path: ['passwordConfirm'],
-  });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
@@ -28,7 +10,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const body = await request.json();
 
     // Validate input data
-    const result = registerSchema.safeParse(body);
+    const result = registerFormSchema.safeParse(body);
     if (!result.success) {
       return new Response(
         JSON.stringify({

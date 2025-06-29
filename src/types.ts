@@ -50,8 +50,34 @@ export interface UserPreferencesDTO {
   allergens: string[];
 }
 
-// Command to update the authenticated user's dietary preferences.
+// Auth Commands
 export interface UpdateUserPreferencesCommand {
   diets: string[];
   allergens: string[];
+}
+
+export interface RegisterUserCommand {
+  email: string;
+  password: string;
+  passwordConfirm: string;
+}
+
+export interface LoginUserCommand {
+  email: string;
+  password: string;
+}
+
+export interface ForgotPasswordCommand {
+  email: string;
+}
+
+export interface ChangePasswordCommand {
+  currentPassword: string;
+  newPassword: string;
+  newPasswordConfirm: string;
+}
+
+export interface UpdatePasswordCommand {
+  password: string;
+  passwordConfirm: string;
 }

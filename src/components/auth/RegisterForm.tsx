@@ -1,8 +1,12 @@
 import * as React from 'react';
+import { useForm } from '@tanstack/react-form';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormMessage } from './FormMessage';
+import { FieldInfo } from './components/FieldInfo';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { registerFormSchema } from '@/lib/schemas/auth.schema';
 
 interface RegisterResponse {
   data: {
@@ -14,96 +18,54 @@ interface RegisterResponse {
 }
 
 export function RegisterForm() {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [passwordConfirm, setPasswordConfirm] = React.useState('');
-  const [error, setError] = React.useState<string | null>(null);
-  const [message, setMessage] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setMessage(null);
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+      passwordConfirm: '',
+    },
+    validators: {
+      onChange: registerFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      setIsLoading(true);
+      setSubmitError(null);
+      setSuccessMessage(null);
 
-    // Basic client-side validation
-    if (!email.trim()) {
-      setError('Email jest wymagany');
-      return;
-    }
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(value),
+        });
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Wprowadź poprawny adres email');
-      return;
-    }
+        const data = (await response.json()) as RegisterResponse;
 
-    if (!password.trim()) {
-      setError('Hasło jest wymagane');
-      return;
-    }
+        if (!response.ok) {
+          setSubmitError(data.error?.message || 'Nie udało się utworzyć konta. Spróbuj ponownie.');
+          return;
+        }
 
-    if (password.length < 8) {
-      setError('Hasło musi mieć co najmniej 8 znaków');
-      return;
-    }
+        setSuccessMessage(
+          data.data?.message || 'Konto zostało utworzone. Link weryfikacyjny został wysłany na podany adres email.'
+        );
 
-    // Check for password requirements
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
-
-    if (!hasUpperCase || !hasNumber || !hasSpecialChar) {
-      setError('Hasło musi zawierać co najmniej jedną wielką literę, jedną cyfrę i jeden znak specjalny');
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      setError('Hasła nie są identyczne');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      // Call the register API endpoint
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          passwordConfirm,
-        }),
-      });
-
-      const data = (await response.json()) as RegisterResponse;
-
-      if (!response.ok) {
-        // Handle error response
-        setError(data.error?.message || 'Nie udało się utworzyć konta. Spróbuj ponownie.');
+        // Reset form after successful submission
+        form.reset();
+      } catch (err) {
+        console.error('Registration error:', err);
+        setSubmitError('Wystąpił problem z połączeniem. Spróbuj ponownie.');
+      } finally {
         setIsLoading(false);
-        return;
       }
-
-      // Show success message
-      setMessage(
-        data.data?.message || 'Konto zostało utworzone. Link weryfikacyjny został wysłany na podany adres email.'
-      );
-
-      // Clear form
-      setEmail('');
-      setPassword('');
-      setPasswordConfirm('');
-    } catch (err) {
-      console.error('Registration error:', err);
-      setError('Wystąpił problem z połączeniem. Spróbuj ponownie.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
   return (
     <Card className="border-none bg-transparent shadow-none">
@@ -114,75 +76,92 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
 
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          {error && <FormMessage type="error">{error}</FormMessage>}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
+        <CardContent className="space-y-4 mb-8">
+          {submitError && <FormMessage type="error">{submitError}</FormMessage>}
+          {successMessage && <FormMessage type="success">{successMessage}</FormMessage>}
 
-          {message && <FormMessage type="success">{message}</FormMessage>}
+          <form.Field name="email">
+            {(field) => (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-200" htmlFor="email">
+                  Adres e-mail
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                  autoComplete="email"
+                  disabled={isLoading || !!successMessage}
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          </form.Field>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" htmlFor="email">
-              Adres e-mail
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-              autoComplete="email"
-              required
-              disabled={isLoading || !!message}
-            />
-          </div>
+          <form.Field name="password">
+            {(field) => (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-200" htmlFor="password">
+                  Hasło
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                  autoComplete="new-password"
+                  disabled={isLoading || !!successMessage}
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          </form.Field>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" htmlFor="password">
-              Hasło
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-              autoComplete="new-password"
-              required
-              disabled={isLoading || !!message}
-            />
-            <p className="text-xs text-gray-400">
-              Hasło musi mieć co najmniej 8 znaków i zawierać wielką literę, cyfrę i znak specjalny
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" htmlFor="passwordConfirm">
-              Potwierdź hasło
-            </label>
-            <Input
-              id="passwordConfirm"
-              type="password"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-              autoComplete="new-password"
-              required
-              disabled={isLoading || !!message}
-            />
-          </div>
+          <form.Field name="passwordConfirm">
+            {(field) => (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-200" htmlFor="passwordConfirm">
+                  Potwierdź hasło
+                </label>
+                <Input
+                  id="passwordConfirm"
+                  type="password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                  autoComplete="new-password"
+                  disabled={isLoading || !!successMessage}
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          </form.Field>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">
-          {!message ? (
+          {!successMessage ? (
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-              disabled={isLoading}
+              disabled={!form.state.isValid || isLoading || form.state.isSubmitting}
             >
-              {isLoading ? (
+              {isLoading || form.state.isSubmitting ? (
                 <>
-                  <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Tworzenie konta...
                 </>
               ) : (
@@ -210,18 +189,3 @@ export function RegisterForm() {
     </Card>
   );
 }
-
-const SpinnerIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-  </svg>
-);
