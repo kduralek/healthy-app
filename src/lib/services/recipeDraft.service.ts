@@ -2,8 +2,6 @@ import type { RecipeDraftDTO } from '@/types';
 import { OpenRouterService } from './openrouter.service';
 import { MockOpenRouterService } from './openrouter.service.mock';
 
-// Use mock service in test environment or when explicitly requested
-// Also use mock if no API key is provided to avoid authentication errors
 const shouldUseMock =
   import.meta.env.USE_MOCK_OPENROUTER === 'true' ||
   import.meta.env.NODE_ENV === 'test' ||
@@ -11,15 +9,6 @@ const shouldUseMock =
   process.env.CI === 'true' || // Add this for any CI environment
   !import.meta.env.OPENROUTER_API_KEY ||
   import.meta.env.OPENROUTER_API_KEY === '';
-
-// Debug logging for service selection
-console.log('RecipeDraft Service Configuration:', {
-  USE_MOCK_OPENROUTER: import.meta.env.USE_MOCK_OPENROUTER,
-  NODE_ENV_importMeta: import.meta.env.NODE_ENV,
-  NODE_ENV_process: process.env.NODE_ENV,
-  hasApiKey: !!import.meta.env.OPENROUTER_API_KEY,
-  shouldUseMock,
-});
 
 const openRouter = shouldUseMock
   ? new MockOpenRouterService()
