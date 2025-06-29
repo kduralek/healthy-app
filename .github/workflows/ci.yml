@@ -83,7 +83,15 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     environment: integration
-    needs: [build]
+    needs: [unit-tests]
+    env:
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+      E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+      E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
+      OPENROUTER_API_KEY: test-key-mock
+      USE_MOCK_OPENROUTER: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -94,34 +102,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-files
-          path: dist/
-
-      - name: Start preview server in background
-        run: npm run preview &
-        env:
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          OPENROUTER_API_KEY: ${{ vars.OPENROUTER_API_KEY }}
-          USE_MOCK_OPENROUTER: ${{ vars.USE_MOCK_OPENROUTER }}
-
-      - name: Wait for server to be ready
-        run: |
-          timeout 60 bash -c 'until curl -f http://localhost:3000 > /dev/null 2>&1; do sleep 2; done'
-
       - name: Run E2E tests
         run: npm run test:e2e
-        env:
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          OPENROUTER_API_KEY: ${{ vars.OPENROUTER_API_KEY }}
-          USE_MOCK_OPENROUTER: ${{ vars.USE_MOCK_OPENROUTER }}
-          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
-          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-          E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
