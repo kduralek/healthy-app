@@ -46,10 +46,12 @@ export default defineConfig({
     },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'npm run dev:e2e',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
+  /* Run your local dev server before starting the tests - only in non-CI environments */
+  ...(!process.env.CI && {
+    webServer: {
+      command: 'npm run dev:e2e',
+      url: 'http://localhost:3000',
+      reuseExistingServer: true,
+    },
+  }),
 });

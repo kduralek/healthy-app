@@ -100,6 +100,18 @@ jobs:
           name: build-files
           path: dist/
 
+      - name: Start preview server in background
+        run: npm run preview &
+        env:
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          OPENROUTER_API_KEY: ${{ vars.OPENROUTER_API_KEY }}
+          USE_MOCK_OPENROUTER: ${{ vars.USE_MOCK_OPENROUTER }}
+
+      - name: Wait for server to be ready
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000 > /dev/null 2>&1; do sleep 2; done'
+
       - name: Run E2E tests
         run: npm run test:e2e
         env:
