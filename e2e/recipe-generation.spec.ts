@@ -11,7 +11,10 @@ test.describe('Recipe Generation Flow', () => {
     // Step 3: User clicks the "Generate Recipe" button
     await authenticatedPage.clickGenerateButton();
 
-    // Verify recipe preview is displayed
+    // Wait for generation to complete
+    await authenticatedPage.waitForRecipeGeneration();
+
+    // Verify final state
     expect(await authenticatedPage.isRecipePreviewVisible()).toBeTruthy();
 
     // Get recipe content for verification

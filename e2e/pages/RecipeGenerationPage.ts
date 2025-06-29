@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
@@ -34,7 +35,14 @@ export class RecipeGenerationPage extends BasePage {
    * Fill in the recipe prompt form
    */
   async fillPromptForm(prompt: string) {
+    await this.page.click(this.promptInputSelector);
     await this.page.fill(this.promptInputSelector, prompt);
+
+    // Wait for form validation to enable the button
+    await this.page.waitForSelector(this.generateButtonSelector + ':not([disabled])', {
+      state: 'attached',
+      timeout: 5000,
+    });
   }
 
   /**
@@ -42,10 +50,9 @@ export class RecipeGenerationPage extends BasePage {
    */
   async clickGenerateButton() {
     await this.page.click(this.generateButtonSelector);
-    // Wait for the recipe to be generated
     await this.page.waitForSelector(this.recipePreviewSelector, {
       state: 'visible',
-      timeout: 10000,
+      timeout: 15000, // Increased timeout for API call
     });
   }
 
@@ -54,6 +61,7 @@ export class RecipeGenerationPage extends BasePage {
    */
   async generateRecipe(prompt: string) {
     await this.fillPromptForm(prompt);
+    await expect(this.page.locator(this.generateButtonSelector)).toBeEnabled();
     await this.clickGenerateButton();
   }
 
@@ -106,5 +114,18 @@ export class RecipeGenerationPage extends BasePage {
    */
   async isSaveSuccessful() {
     return await this.page.isVisible(`${this.saveButtonSelector} >> text=Zapisano`);
+  }
+
+  // Add helper method to check loading state
+  async isRecipeLoading() {
+    return await this.page.isVisible('[data-testid="recipe-preview-skeleton"]');
+  }
+
+  async waitForRecipeGeneration() {
+    // Wait for either success (preview) or error state
+    await Promise.race([
+      this.page.waitForSelector(this.recipePreviewSelector, { state: 'visible', timeout: 20000 }),
+      this.page.waitForSelector('[data-testid="recipe-generation-error"]', { state: 'visible', timeout: 20000 }),
+    ]);
   }
 }

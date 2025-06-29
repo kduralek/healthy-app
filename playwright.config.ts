@@ -2,7 +2,14 @@ import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
+// Load .env.test only if it exists (local development)
+const envTestPath = path.resolve(process.cwd(), '.env.test');
+try {
+  dotenv.config({ path: envTestPath });
+} catch {
+  // .env.test doesn't exist (likely CI environment)
+  // Environment variables will be provided by the CI system
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -51,5 +58,15 @@ export default defineConfig({
     command: 'npm run dev:e2e',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    env: {
+      // Ensure environment variables are available for the dev server
+      SUPABASE_URL: process.env.SUPABASE_URL || '',
+      SUPABASE_KEY: process.env.SUPABASE_KEY || '',
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || '',
+      USE_MOCK_OPENROUTER: process.env.USE_MOCK_OPENROUTER || '',
+      E2E_USERNAME: process.env.E2E_USERNAME || '',
+      E2E_PASSWORD: process.env.E2E_PASSWORD || '',
+      E2E_USERNAME_ID: process.env.E2E_USERNAME_ID || '',
+    },
   },
 });
