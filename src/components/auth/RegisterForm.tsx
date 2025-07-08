@@ -7,20 +7,10 @@ import { FormMessage } from './FormMessage';
 import { FieldInfo } from './components/FieldInfo';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { registerFormSchema } from '@/lib/schemas/auth.schema';
-
-interface RegisterResponse {
-  data: {
-    message: string;
-  };
-  error?: {
-    message: string;
-  };
-}
+import { useAuth } from './hooks/useAuth';
 
 export function RegisterForm() {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+  const { register, isLoading, error, successMessage, navigateToLogin } = useAuth();
 
   const form = useForm({
     defaultValues: {
@@ -32,37 +22,9 @@ export function RegisterForm() {
       onChange: registerFormSchema,
     },
     onSubmit: async ({ value }) => {
-      setIsLoading(true);
-      setSubmitError(null);
-      setSuccessMessage(null);
-
-      try {
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(value),
-        });
-
-        const data = (await response.json()) as RegisterResponse;
-
-        if (!response.ok) {
-          setSubmitError(data.error?.message || 'Nie udało się utworzyć konta. Spróbuj ponownie.');
-          return;
-        }
-
-        setSuccessMessage(
-          data.data?.message || 'Konto zostało utworzone. Link weryfikacyjny został wysłany na podany adres email.'
-        );
-
-        // Reset form after successful submission
+      const success = await register(value);
+      if (success) {
         form.reset();
-      } catch (err) {
-        console.error('Registration error:', err);
-        setSubmitError('Wystąpił problem z połączeniem. Spróbuj ponownie.');
-      } finally {
-        setIsLoading(false);
       }
     },
   });
@@ -84,7 +46,7 @@ export function RegisterForm() {
         }}
       >
         <CardContent className="space-y-4 mb-8">
-          {submitError && <FormMessage type="error">{submitError}</FormMessage>}
+          {error && <FormMessage type="error">{error}</FormMessage>}
           {successMessage && <FormMessage type="success">{successMessage}</FormMessage>}
 
           <form.Field name="email">
@@ -172,7 +134,7 @@ export function RegisterForm() {
             <Button
               type="button"
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-              onClick={() => (window.location.href = '/auth/login')}
+              onClick={navigateToLogin}
             >
               Przejdź do logowania
             </Button>
